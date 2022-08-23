@@ -12,6 +12,7 @@ import com.atguigu.gmall.product.service.BaseCategory3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,6 +47,7 @@ public class CategoryController {
      * 获取所有的一级分类
      * @GetMapping：GET请求
      * @PostMapping：POST请求
+     * 
      */
     @GetMapping("/getCategory1")
     public Result getCategory1(){
@@ -60,6 +62,7 @@ public class CategoryController {
     /**
      * 获取某个一级分类下的所有二级分类
      * @param c1Id 传入一个一级分类id
+     *
      */
     //http://192.168.200.1/admin/product/getCategory2/9
     @GetMapping("/getCategory2/{c1Id}")
@@ -80,4 +83,7 @@ public class CategoryController {
         List<BaseCategory3> category3s = baseCategory3Service.getCategory2Child(c2Id);
         return Result.ok(category3s);
     }
+
+
+
 }
