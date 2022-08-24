@@ -24,6 +24,7 @@ public class BaseAttrValueServiceImpl extends ServiceImpl<BaseAttrValueMapper, B
 
     @Override
     public List<BaseAttrValue> getAttrValueList(Long attrId) {
+
         QueryWrapper<BaseAttrValue> queryWrapper=new QueryWrapper();
 
         queryWrapper.eq("attr_id",attrId);

@@ -5,6 +5,7 @@ import com.atguigu.gmall.model.product.BaseAttrInfo;
 import com.atguigu.gmall.model.product.BaseAttrValue;
 import com.atguigu.gmall.product.service.BaseAttrInfoService;
 import com.atguigu.gmall.product.service.BaseAttrValueService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,10 +54,13 @@ public class BaseAttrController {
 
     /** getAttrValueList/11
      * 根据平台属性id获取属性所有信息
+     * 根据属性id获取该属性的所有属性值
      */
     @GetMapping("getAttrValueList/{attrId}")
     public Result getAttrValueList(@PathVariable Long attrId){
+
         List<BaseAttrValue> values = baseAttrValueService.getAttrValueList(attrId);
+
         return Result.ok(values);
     }
 

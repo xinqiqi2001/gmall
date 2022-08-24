@@ -40,14 +40,15 @@
         select i.*, v.id vid, v.value_name, v.attr_id
         from base_attr_info i
         left join base_attr_value v on i.id = v.attr_id
+
         <where>
-            <if test="category1Id != null">
+            <if test="category1Id != null and category1Id !=0">
                 i.category_id = #{category1Id} and i.category_level = 1
             </if>
-            <if test="category2Id != null">
+            <if test="category2Id != null and category2Id !=0">
                 or i.category_id = #{category2Id} and i.category_level = 2
             </if>
-            <if test="category3Id != null">
+            <if test="category3Id != null and category3Id !=0">
                 or i.category_id = #{category3Id} and i.category_level = 3
             </if>
         </where>
