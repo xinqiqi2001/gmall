@@ -4,12 +4,18 @@ import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.BaseTrademark;
 import com.atguigu.gmall.product.service.BaseTrademarkService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
- * @author Xiaoxin
- */
+ * date 2022/8/25
+ * @since 1.8
+ * @author
+*/
+
 @RestController
 @RequestMapping("admin/product/")
 public class BaseTrademarkController {
@@ -80,6 +86,18 @@ public class BaseTrademarkController {
 
         baseTrademarkService.removeById(id);
         return Result.ok();
+    }
+
+
+    //------------------------------------8.25
+    /**
+     * 获取品牌属性
+     * @return
+     */
+    @GetMapping("baseTrademark/getTrademarkList")
+    public Result getTrademarkList(){
+        List<BaseTrademark> list = baseTrademarkService.list();
+        return Result.ok(list);
     }
 
 }

@@ -3,9 +3,15 @@ package com.atguigu.gmall.product.controller;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.BaseAttrInfo;
 import com.atguigu.gmall.model.product.BaseAttrValue;
+import com.atguigu.gmall.model.product.BaseSaleAttr;
+import com.atguigu.gmall.model.product.SpuInfo;
 import com.atguigu.gmall.product.service.BaseAttrInfoService;
 import com.atguigu.gmall.product.service.BaseAttrValueService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.atguigu.gmall.product.service.BaseSaleAttrService;
+import com.atguigu.gmall.product.service.SpuInfoService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +19,7 @@ import java.util.List;
 
 /**
  * @author Xiaoxin
+ *
  */
 @RestController
 @RequestMapping("/admin/product/")
@@ -23,6 +30,12 @@ public class BaseAttrController {
 
     @Autowired
     BaseAttrValueService baseAttrValueService;
+
+    @Autowired
+    SpuInfoService spuInfoService;
+
+    @Autowired
+    BaseSaleAttrService baseSaleAttrService;
 
 
     /**
@@ -63,5 +76,43 @@ public class BaseAttrController {
 
         return Result.ok(values);
     }
+
+    //------------------------------------8.25
+    /**
+     * 获取spu分页列表
+     * @param pn
+     * @param limit
+     * @param category3Id
+     * @return
+     */
+    @GetMapping("{pn}/{limit}")
+    public Result page(@PathVariable Long pn, @PathVariable Long limit, @Param("category3Id")Long category3Id ){
+
+        Page<SpuInfo> pages=new Page<>(pn,limit);
+
+        //分页查询 (分页信息 查询到的记录的集合)
+        Page<SpuInfo> resultPage = spuInfoService.page(pages, new LambdaQueryWrapper<SpuInfo>()
+                .eq(SpuInfo::getCategory3Id,category3Id));
+
+        return Result.ok(resultPage);
+
+
+    }
+
+    /**
+     * 获取销售属性
+     * @return
+     */
+    @GetMapping("baseSaleAttrList")
+    public Result baseSaleAttrList(){
+
+        List<BaseSaleAttr> list = baseSaleAttrService.list();
+
+        return Result.ok(list);
+    }
+
+
+
+
 
 }
