@@ -9,6 +9,9 @@ import com.atguigu.gmall.product.mapper.BaseCategory1Mapper;
 import com.atguigu.gmall.product.service.BaseCategory1Service;
 import com.atguigu.gmall.product.service.BaseCategory2Service;
 import com.atguigu.gmall.product.service.BaseCategory3Service;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,7 @@ import java.util.List;
 //@Controller 这个类是来接受请求的
 @RequestMapping("/admin/product") //抽取公共路径
 @RestController
+@Api(tags = "(1.2.3级)分类")
 public class CategoryController {
 
 
@@ -49,6 +53,7 @@ public class CategoryController {
      * @PostMapping：POST请求
      * 
      */
+    @ApiOperation("获取所有的一级分类")
     @GetMapping("/getCategory1")
     public Result getCategory1(){
 
@@ -65,6 +70,7 @@ public class CategoryController {
      *
      */
     //http://192.168.200.1/admin/product/getCategory2/9
+    @ApiOperation("获取某个一级分类下的所有二级分类")
     @GetMapping("/getCategory2/{c1Id}")
     public Result getCategory2(@PathVariable("c1Id")Long c1Id){
         //查询 父分类id是c1Id 的所有二级分类
@@ -76,7 +82,7 @@ public class CategoryController {
      * 获取某个二级分类下的所有三级分类
      * @param c2Id 传入一个一级分类id
      */
-
+    @ApiOperation("获取某个二级分类下的所有三级分类")
     @GetMapping("/getCategory3/{c2Id}")
     public Result getCategory3(@PathVariable("c2Id")Long c2Id){
         //查询 父分类id是c1Id 的所有三级分类

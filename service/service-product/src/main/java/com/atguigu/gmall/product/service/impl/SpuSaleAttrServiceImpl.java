@@ -29,16 +29,18 @@ public class SpuSaleAttrServiceImpl extends ServiceImpl<SpuSaleAttrMapper, SpuSa
     @Override
     public List<SpuSaleAttr>  saleAttrAndValue(Long spuId) {
 
+        //根据spuId查询属性名
         List<SpuSaleAttr> list = this.list(new LambdaQueryWrapper<SpuSaleAttr>().eq(SpuSaleAttr::getSpuId, spuId));
 
-
+        //遍历属性名对象  给属性名对象中的属性值属性 赋值
         for (SpuSaleAttr spuSaleAttr : list) {
 
+            //根据销售属性id查询属性值集合
             Long baseSaleAttrId = spuSaleAttr.getBaseSaleAttrId();
 
             List<SpuSaleAttrValue> values = saleAttrValueService.list(new LambdaQueryWrapper<SpuSaleAttrValue>().eq(SpuSaleAttrValue::getSpuId, spuId)
                             .eq(SpuSaleAttrValue::getBaseSaleAttrId,baseSaleAttrId));
-
+            //将查询到的属性值集合 赋给属性名对象的属性
             spuSaleAttr.setSpuSaleAttrValueList(values);
         }
 

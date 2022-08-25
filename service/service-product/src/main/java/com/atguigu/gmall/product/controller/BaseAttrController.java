@@ -11,6 +11,9 @@ import com.atguigu.gmall.product.service.BaseSaleAttrService;
 import com.atguigu.gmall.product.service.SpuInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,7 @@ import java.util.List;
  * @author Xiaoxin
  *
  */
+@Api(tags = "平台属性")
 @RestController
 @RequestMapping("/admin/product/")
 public class BaseAttrController {
@@ -34,8 +38,7 @@ public class BaseAttrController {
     @Autowired
     SpuInfoService spuInfoService;
 
-    @Autowired
-    BaseSaleAttrService baseSaleAttrService;
+
 
 
     /**
@@ -44,6 +47,7 @@ public class BaseAttrController {
      * @param category3Id
      * @return//查询某个平台下的所有平台属性
      */
+    @ApiOperation("查询某个平台下的所有平台属性")
     @GetMapping("attrInfoList/{category1Id}/{category2Id}/{category3Id}")
     public Result getAttrInfoList(@PathVariable("category1Id") Long category1Id,
                                   @PathVariable("category2Id") Long category2Id,
@@ -57,6 +61,7 @@ public class BaseAttrController {
      * 保存属性信息
      * @return
      */
+    @ApiOperation("保存属性信息")
     @PostMapping("saveAttrInfo")
     public Result saveAttrInfo(@RequestBody BaseAttrInfo baseAttrInfo) {
 
@@ -69,6 +74,7 @@ public class BaseAttrController {
      * 根据平台属性id获取属性所有信息
      * 根据属性id获取该属性的所有属性值
      */
+    @ApiOperation("根据属性id获取该属性的所有属性值")
     @GetMapping("getAttrValueList/{attrId}")
     public Result getAttrValueList(@PathVariable Long attrId){
 
@@ -77,39 +83,6 @@ public class BaseAttrController {
         return Result.ok(values);
     }
 
-    //------------------------------------8.25
-    /**
-     * 获取spu分页列表
-     * @param pn
-     * @param limit
-     * @param category3Id
-     * @return
-     */
-    @GetMapping("{pn}/{limit}")
-    public Result page(@PathVariable Long pn, @PathVariable Long limit, @Param("category3Id")Long category3Id ){
-
-        Page<SpuInfo> pages=new Page<>(pn,limit);
-
-        //分页查询 (分页信息 查询到的记录的集合)
-        Page<SpuInfo> resultPage = spuInfoService.page(pages, new LambdaQueryWrapper<SpuInfo>()
-                .eq(SpuInfo::getCategory3Id,category3Id));
-
-        return Result.ok(resultPage);
-
-
-    }
-
-    /**
-     * 获取销售属性
-     * @return
-     */
-    @GetMapping("baseSaleAttrList")
-    public Result baseSaleAttrList(){
-
-        List<BaseSaleAttr> list = baseSaleAttrService.list();
-
-        return Result.ok(list);
-    }
 
 
 

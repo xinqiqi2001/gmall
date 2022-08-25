@@ -5,6 +5,9 @@ import com.atguigu.gmall.model.product.BaseTrademark;
 import com.atguigu.gmall.product.service.BaseTrademarkService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sun.xml.internal.bind.v2.TODO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +19,8 @@ import java.util.List;
  * @author
 */
 
+
+@Api(tags = "品牌")
 @RestController
 @RequestMapping("admin/product/")
 public class BaseTrademarkController {
@@ -30,6 +35,7 @@ public class BaseTrademarkController {
      * @param limit  每页有几条
      * @return
      */
+    @ApiOperation("分页查询所有品牌")
     @GetMapping("baseTrademark/{pn}/{limit}")
     public Result baseTrademark(@PathVariable("pn") Long pn, @PathVariable("limit") Long limit){
 
@@ -46,6 +52,7 @@ public class BaseTrademarkController {
      * @param id
      * @return
      */
+    @ApiOperation("根据Id获取品牌")
     @GetMapping("baseTrademark/get/{id}")
     public Result getByIdTrademark(@PathVariable("id") Integer id){
 
@@ -58,6 +65,7 @@ public class BaseTrademarkController {
      * @param baseTrademark
      * @return
      */
+    @ApiOperation("修改品牌")
     @PutMapping("baseTrademark/update")
     public Result getByIdTrademark(@RequestBody BaseTrademark baseTrademark){
 
@@ -70,6 +78,7 @@ public class BaseTrademarkController {
      * @param baseTrademark
      * @return
      */
+    @ApiOperation("保存品牌")
     @PostMapping("baseTrademark/save")
     public Result save(@RequestBody BaseTrademark baseTrademark){
         baseTrademarkService.save(baseTrademark);
@@ -81,6 +90,7 @@ public class BaseTrademarkController {
      * @param id
      * @return
      */
+    @ApiOperation("根据id删除品牌")
     @DeleteMapping("baseTrademark/remove/{id}")
     public Result delete(@PathVariable("id") Integer id){
 
