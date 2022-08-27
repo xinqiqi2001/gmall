@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ import java.util.List;
 public class CategoryController {
 
 
-    @Autowired
+    @Resource
     BaseCategory1Service baseCategory1Service;
 
     @Autowired

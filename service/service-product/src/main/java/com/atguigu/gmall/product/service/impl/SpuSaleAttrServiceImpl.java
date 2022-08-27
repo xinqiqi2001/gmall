@@ -40,6 +40,7 @@ public class SpuSaleAttrServiceImpl extends ServiceImpl<SpuSaleAttrMapper, SpuSa
 
             List<SpuSaleAttrValue> values = saleAttrValueService.list(new LambdaQueryWrapper<SpuSaleAttrValue>().eq(SpuSaleAttrValue::getSpuId, spuId)
                             .eq(SpuSaleAttrValue::getBaseSaleAttrId,baseSaleAttrId));
+
             //将查询到的属性值集合 赋给属性名对象的属性
             spuSaleAttr.setSpuSaleAttrValueList(values);
         }

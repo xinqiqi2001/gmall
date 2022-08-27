@@ -24,11 +24,19 @@ spring:
             allowCredentials: true #允许带一些安全标志跨域 比如Cookie
 
 
-      #所有的网关路由规则
+#      所有的网关路由规则
       routes:
         - id: product_route # 以 /admin/product 开头的所有请求都lb(loadbalancer)转给service-product
           uri: lb://service-product
           predicates:  #断言
             - Path=/admin/product/**
+
+        - id: web_all_route
+          uri: lb://web-all
+          predicates: #断言
+            - Host=**.gmall.com
+
+
+
 
 

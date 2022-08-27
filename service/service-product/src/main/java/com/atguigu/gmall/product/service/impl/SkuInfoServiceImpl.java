@@ -1,19 +1,17 @@
 package com.atguigu.gmall.product.service.impl;
 
-import com.atguigu.gmall.model.product.SkuAttrValue;
-import com.atguigu.gmall.model.product.SkuImage;
-import com.atguigu.gmall.model.product.SkuInfo;
-import com.atguigu.gmall.model.product.SkuSaleAttrValue;
-import com.atguigu.gmall.product.service.SkuAttrValueService;
-import com.atguigu.gmall.product.service.SkuImageService;
-import com.atguigu.gmall.product.service.SkuInfoService;
+import com.atguigu.gmall.model.product.*;
+import com.atguigu.gmall.model.to.CategoryViewTo;
+import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
+import com.atguigu.gmall.product.service.*;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
-import com.atguigu.gmall.product.service.SkuSaleAttrValueService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,9 +33,19 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     SkuSaleAttrValueService skuSaleAttrValueService;
 
     @Autowired
+    SpuSaleAttrService spuSaleAttrService;
+
+    @Autowired
     SkuInfoMapper skuInfoMapper;
 
+    @Autowired
+    BaseCategory3Mapper baseCategory3Mapper;
     //事务
+
+    /**
+     * 保存sku
+     * @param info
+     */
     @Transactional
     @Override
     public void saveSkuInfo(SkuInfo info) {
@@ -72,6 +80,61 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
         skuSaleAttrValueService.saveBatch(saleAttrValueList);
 
+    }
+
+    /**
+     * 查询商品信息
+     * @param skuId
+     * @return
+     */
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+        SkuDetailTo detailTo = new SkuDetailTo();
+        //0、查询到商品的基本信息 skuInfo
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+
+
+        //2、商品（sku）的基本信息   对应的表是sku_info
+        //把查询到的数据一定放到 SkuDetailTo 中
+        detailTo.setSkuInfo(skuInfo);
+
+        //3、商品（sku）的图片        对应的表是sku_image
+        List<SkuImage> imageList = skuImageService.getSkuImage(skuId);
+        skuInfo.setSkuImageList(imageList);
+
+
+        //1、商品（sku）所属的完整分类信息：  base_category1、base_category2、base_category3
+        CategoryViewTo categoryViewTo = baseCategory3Mapper.getCategoryView(skuInfo.getCategory3Id());
+        detailTo.setCategoryView(categoryViewTo);
+
+
+        //实时价格查询
+        BigDecimal price = get1010Price(skuId);
+        detailTo.setPrice(price);
+//
+//        //4、商品（sku）所属的SPU当时定义的所有销售属性名值组合（固定好顺序）。
+//        //          spu_sale_attr、spu_sale_attr_value
+//        //          并标识出当前sku到底spu的那种组合，页面要有高亮框 sku_sale_attr_value
+//        //查询当前sku对应的spu定义的所有销售属性名和值（固定好顺序）并且标记好当前sku属于哪一种组合
+//        List<SpuSaleAttr> saleAttrList = spuSaleAttrService
+//                .getSaleAttrAndValueMarkSku(skuInfo.getSpuId(),skuId);
+//        detailTo.setSpuSaleAttrList(saleAttrList);
+
+        //--------------------暂时没有这些业务----------------------------
+        //5、商品（sku）类似推荐    （x）
+        //6、商品（sku）介绍[所属的spu的海报]        spu_poster（x）
+        //7、商品（sku）的规格参数                  sku_attr_value
+        //8、商品（sku）售后、评论...              相关的表 (x)
+
+
+        return detailTo;
+    }
+
+    @Override
+    public BigDecimal get1010Price(Long skuId) {
+        //查询实时价格
+        BigDecimal price = skuInfoMapper.getRealPrice(skuId);
+        return price;
     }
 }
 
