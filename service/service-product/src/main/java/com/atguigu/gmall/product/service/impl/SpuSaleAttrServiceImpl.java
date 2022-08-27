@@ -16,18 +16,26 @@ import java.util.List;
 import java.util.Map;
 
 /**
-* @author Xiaoxin
-* @description 针对表【spu_sale_attr(spu销售属性)】的数据库操作Service实现
-* @createDate 2022-08-23 20:48:38
-*/
+ * @author Xiaoxin
+ * @description 针对表【spu_sale_attr(spu销售属性)】的数据库操作Service实现
+ * @createDate 2022-08-23 20:48:38
+ */
 @Service
 public class SpuSaleAttrServiceImpl extends ServiceImpl<SpuSaleAttrMapper, SpuSaleAttr>
-    implements SpuSaleAttrService{
+        implements SpuSaleAttrService {
     @Autowired
     SpuSaleAttrValueService saleAttrValueService;
 
+    @Autowired
+    SpuSaleAttrMapper spuSaleAttrMapper;
+
+    /**
+     * 显示查询所有销售属性名和值
+     * @param spuId
+     * @return
+     */
     @Override
-    public List<SpuSaleAttr>  saleAttrAndValue(Long spuId) {
+    public List<SpuSaleAttr> saleAttrAndValue(Long spuId) {
 
         //根据spuId查询属性名
         List<SpuSaleAttr> list = this.list(new LambdaQueryWrapper<SpuSaleAttr>().eq(SpuSaleAttr::getSpuId, spuId));
@@ -39,13 +47,26 @@ public class SpuSaleAttrServiceImpl extends ServiceImpl<SpuSaleAttrMapper, SpuSa
             Long baseSaleAttrId = spuSaleAttr.getBaseSaleAttrId();
 
             List<SpuSaleAttrValue> values = saleAttrValueService.list(new LambdaQueryWrapper<SpuSaleAttrValue>().eq(SpuSaleAttrValue::getSpuId, spuId)
-                            .eq(SpuSaleAttrValue::getBaseSaleAttrId,baseSaleAttrId));
+                    .eq(SpuSaleAttrValue::getBaseSaleAttrId, baseSaleAttrId));
 
             //将查询到的属性值集合 赋给属性名对象的属性
             spuSaleAttr.setSpuSaleAttrValueList(values);
         }
 
         return list;
+    }
+
+    /**
+     *
+     * 显示查询某个sku对应的销售属性名和值 并标记出当前sku是什么组合
+     * @param spuId
+     * @param skuId
+     * @return
+     */
+    @Override
+    public List<SpuSaleAttr> getSaleAttrAndValueMarkSku(Long spuId, Long skuId) {
+        List<SpuSaleAttr>saleAttrList=spuSaleAttrMapper.getSaleAttrAndValueMarkSku(spuId,skuId);
+        return saleAttrList;
     }
 }
 

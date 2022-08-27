@@ -25,6 +25,8 @@
     </resultMap>
 
 
+<!--         * 获取层级的分类路径
+     * 根据传来的三级id查询二级目录和一级分类-->
     <select id="getCategoryView" resultMap="CategoryViewRM">
         select bc3.id c3_id,
                bc3.name c3_name,

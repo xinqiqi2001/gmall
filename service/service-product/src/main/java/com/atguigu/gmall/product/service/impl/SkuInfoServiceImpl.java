@@ -15,13 +15,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
-* @author Xiaoxin
-* @description 针对表【sku_info(库存单元表)】的数据库操作Service实现
-* @createDate 2022-08-23 20:48:38
-*/
+ * @author Xiaoxin
+ * @description 针对表【sku_info(库存单元表)】的数据库操作Service实现
+ * @createDate 2022-08-23 20:48:38
+ */
 @Service
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
-    implements SkuInfoService{
+        implements SkuInfoService {
 
     @Autowired
     SkuImageService skuImageService;
@@ -44,6 +44,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
     /**
      * 保存sku
+     *
      * @param info
      */
     @Transactional
@@ -54,7 +55,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         Long skuId = info.getId();
 
         //2、sku的图片信息保存到 sku_image
-        info.getSkuImageList().forEach(skuImage->{
+        info.getSkuImageList().forEach(skuImage -> {
             skuImage.setSkuId(skuId);
 
         });
@@ -64,7 +65,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         //3、sku的平台属性名和值的关系保存到 sku_attr_value
         List<SkuAttrValue> attrValueList = info.getSkuAttrValueList();
 
-        attrValueList.forEach(attrValue->{
+        attrValueList.forEach(attrValue -> {
             attrValue.setSkuId(skuId);
         });
 
@@ -73,7 +74,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         //4、sku的销售属性名和值的关系保存到 sku_sale_attr_value
         List<SkuSaleAttrValue> saleAttrValueList = info.getSkuSaleAttrValueList();
 
-        saleAttrValueList.forEach(saleAttrValue->{
+        saleAttrValueList.forEach(saleAttrValue -> {
             saleAttrValue.setSkuId(skuId);
             saleAttrValue.setSpuId(info.getSpuId());
         });
@@ -84,11 +85,14 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
     /**
      * 查询商品信息
+     *
      * @param skuId
      * @return
      */
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
+        //TODO 最后将这个方法里的其他方法拆分成其他方法
+
         SkuDetailTo detailTo = new SkuDetailTo();
         //0、查询到商品的基本信息 skuInfo
         SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
@@ -111,14 +115,13 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         //实时价格查询
         BigDecimal price = get1010Price(skuId);
         detailTo.setPrice(price);
-//
-//        //4、商品（sku）所属的SPU当时定义的所有销售属性名值组合（固定好顺序）。
-//        //          spu_sale_attr、spu_sale_attr_value
-//        //          并标识出当前sku到底spu的那种组合，页面要有高亮框 sku_sale_attr_value
-//        //查询当前sku对应的spu定义的所有销售属性名和值（固定好顺序）并且标记好当前sku属于哪一种组合
-//        List<SpuSaleAttr> saleAttrList = spuSaleAttrService
-//                .getSaleAttrAndValueMarkSku(skuInfo.getSpuId(),skuId);
-//        detailTo.setSpuSaleAttrList(saleAttrList);
+
+        //TODO 改写这个了 4、商品（sku）所属的SPU当时定义的所有销售属性名值组合（按固定的排序展示）。
+        //          spu_sale_attr、spu_sale_attr_value
+        //          并标识出当前sku到底spu的那种组合，页面要有高亮框 sku_sale_attr_value
+        //查询当前sku对应的spu定义的所有销售属性名和值（固定好顺序）并且标记好当前sku属于哪一种组合
+        List<SpuSaleAttr> saleAttrList = spuSaleAttrService.getSaleAttrAndValueMarkSku(skuInfo.getSpuId(),skuId);
+        detailTo.setSpuSaleAttrList(saleAttrList);
 
         //--------------------暂时没有这些业务----------------------------
         //5、商品（sku）类似推荐    （x）

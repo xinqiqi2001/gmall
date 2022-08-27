@@ -43,8 +43,8 @@ public class ItemController {
             model.addAttribute("skuInfo", skuDetailTo.getSkuInfo());
             BigDecimal price = skuDetailTo.getPrice();
             model.addAttribute("price",price);
-//            model.addAttribute("spuSaleAttrList",skuDetailTo.getSpuSaleAttrList());//spu的销售属性列表
-//            model.addAttribute("valuesSkuJson",skuDetailTo.getValuesSkuJson());//json
+            model.addAttribute("spuSaleAttrList",skuDetailTo.getSpuSaleAttrList());//spu的销售属性列表
+            model.addAttribute("valuesSkuJson",skuDetailTo.getValuesSkuJson());//json
         }
 
 

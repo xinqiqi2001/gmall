@@ -3,6 +3,9 @@ package com.atguigu.gmall.product.mapper;
 
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author Xiaoxin
@@ -12,6 +15,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface SpuSaleAttrMapper extends BaseMapper<SpuSaleAttr> {
 
+    /**
+     * 显示查询某个sku对应的销售属性名和值 并标记出当前sku是什么组合
+     * @param spuId
+     * @param skuId
+     * @return
+     */
+    List<SpuSaleAttr> getSaleAttrAndValueMarkSku(@Param("spuId") Long spuId,@Param("skuId") Long skuId);
 }
 
 

@@ -5,14 +5,46 @@
 <mapper namespace="com.atguigu.gmall.product.mapper.SpuSaleAttrMapper">
 
     <resultMap id="BaseResultMap" type="com.atguigu.gmall.model.product.SpuSaleAttr">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="spuId" column="spu_id" jdbcType="BIGINT"/>
-            <result property="baseSaleAttrId" column="base_sale_attr_id" jdbcType="BIGINT"/>
-            <result property="saleAttrName" column="sale_attr_name" jdbcType="VARCHAR"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="spuId" column="spu_id" jdbcType="BIGINT"/>
+        <result property="baseSaleAttrId" column="base_sale_attr_id" jdbcType="BIGINT"/>
+        <result property="saleAttrName" column="sale_attr_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,spu_id,base_sale_attr_id,
         sale_attr_name
     </sql>
+
+    <!--    销售属性名和值的封装规则-->
+    <resultMap id="SaleAttrNameAndValueRM"
+               type="com.atguigu.gmall.model.product.SpuSaleAttr"
+               autoMapping="true">
+        <id column="id" property="id"></id>
+        <collection property="spuSaleAttrValueList" ofType="com.atguigu.gmall.model.product.SpuSaleAttrValue"
+                    autoMapping="true">
+        <id column="vid" property="id"></id>
+        </collection>
+
+    </resultMap>
+
+
+    <!--显示查询某个sku对应的销售属性名和值 并标记出当前sku是什么组合-->
+    <select id="getSaleAttrAndValueMarkSku" resultMap="SaleAttrNameAndValueRM">
+
+        select ssa.*,
+               ssav.id                                      vid,
+               ssav.sale_attr_value_name,
+               if(skuv.sale_attr_value_id is null, 0, 1) as is_checked,
+               skuv.sale_attr_value_id
+        from spu_sale_attr ssa
+                 left join spu_sale_attr_value ssav
+                           on ssa.spu_id = ssav.spu_id and ssa.base_sale_attr_id = ssav.base_sale_attr_id
+                 left join sku_sale_attr_value skuv
+                           on skuv.sale_attr_value_id = ssav.id and skuv.sku_id = #{skuId}
+        where ssa.spu_id = #{spuId}
+        order by ssa.id, ssav.id;
+
+    </select>
+
 </mapper>
