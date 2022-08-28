@@ -3,6 +3,7 @@ package com.atguigu.gmall.product.service.impl;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.gmall.model.to.ValueSkuJsonTo;
 import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
 import com.atguigu.gmall.product.service.*;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
@@ -85,59 +86,93 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
     /**
      * 查询商品信息
+     * 不用这个总查询了  执行单一策略 每个请求对应一个接口
      *
      * @param skuId
      * @return
      */
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
-        //TODO 最后将这个方法里的其他方法拆分成其他方法
-
-        SkuDetailTo detailTo = new SkuDetailTo();
-        //0、查询到商品的基本信息 skuInfo
-        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
-
-
-        //2、商品（sku）的基本信息   对应的表是sku_info
-        //把查询到的数据一定放到 SkuDetailTo 中
-        detailTo.setSkuInfo(skuInfo);
-
-        //3、商品（sku）的图片        对应的表是sku_image
-        List<SkuImage> imageList = skuImageService.getSkuImage(skuId);
-        skuInfo.setSkuImageList(imageList);
-
-
-        //1、商品（sku）所属的完整分类信息：  base_category1、base_category2、base_category3
-        CategoryViewTo categoryViewTo = baseCategory3Mapper.getCategoryView(skuInfo.getCategory3Id());
-        detailTo.setCategoryView(categoryViewTo);
-
-
-        //实时价格查询
-        BigDecimal price = get1010Price(skuId);
-        detailTo.setPrice(price);
-
-        //TODO 改写这个了 4、商品（sku）所属的SPU当时定义的所有销售属性名值组合（按固定的排序展示）。
-        //          spu_sale_attr、spu_sale_attr_value
-        //          并标识出当前sku到底spu的那种组合，页面要有高亮框 sku_sale_attr_value
-        //查询当前sku对应的spu定义的所有销售属性名和值（固定好顺序）并且标记好当前sku属于哪一种组合
-        List<SpuSaleAttr> saleAttrList = spuSaleAttrService.getSaleAttrAndValueMarkSku(skuInfo.getSpuId(),skuId);
-        detailTo.setSpuSaleAttrList(saleAttrList);
-
-        //--------------------暂时没有这些业务----------------------------
-        //5、商品（sku）类似推荐    （x）
-        //6、商品（sku）介绍[所属的spu的海报]        spu_poster（x）
-        //7、商品（sku）的规格参数                  sku_attr_value
-        //8、商品（sku）售后、评论...              相关的表 (x)
-
-
-        return detailTo;
+//        //TODO 最后将这个方法里的其他方法拆分成其他方法
+//
+//        SkuDetailTo detailTo = new SkuDetailTo();
+//        //0、查询到商品的基本信息 skuInfo  v
+//        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+//
+//
+//        //2、商品（sku）的基本信息   对应的表是sku_info
+//        //把查询到的数据一定放到 SkuDetailTo 中
+//        detailTo.setSkuInfo(skuInfo);
+//
+//        //3、商品（sku）的图片        对应的表是sku_image   v
+//        List<SkuImage> imageList = skuImageService.getSkuImage(skuId);
+//        skuInfo.setSkuImageList(imageList);
+//
+//
+//        //1、商品（sku）所属的完整分类信息：  base_category1、base_category2、base_category3
+//        CategoryViewTo categoryViewTo = baseCategory3Mapper.getCategoryView(skuInfo.getCategory3Id());
+//        detailTo.setCategoryView(categoryViewTo);
+//
+//
+//        //实时价格查询
+//        BigDecimal price = get1010Price(skuId);
+//        detailTo.setPrice(price);
+//
+//        //TODO 改写这个了 4、商品（sku）所属的SPU当时定义的所有销售属性名值组合（按固定的排序展示）。
+//        //          spu_sale_attr、spu_sale_attr_value
+//        //          并标识出当前sku到底spu的那种组合，页面要有高亮框 sku_sale_attr_value
+//        //查询当前sku对应的spu定义的所有销售属性名和值（固定好顺序）并且标记好当前sku属于哪一种组合
+//        List<SpuSaleAttr> saleAttrList = spuSaleAttrService.getSaleAttrAndValueMarkSku(skuInfo.getSpuId(), skuId);
+//        detailTo.setSpuSaleAttrList(saleAttrList);
+//
+//        //--------------------暂时没有这些业务----------------------------
+//        //5、商品（sku）类似推荐    （x）
+//        Long id = skuInfo.getId();
+//        Long spuId = skuInfo.getSpuId();
+//        String valueJson = spuSaleAttrService.getAllSkuSaleAttrValueJson(spuId);
+//
+//        detailTo.setValuesSkuJson(valueJson);
+//        //6、商品（sku）介绍[所属的spu的海报]        spu_poster（x）
+//        //7、商品（sku）的规格参数                  sku_attr_value
+//        //8、商品（sku）售后、评论...              相关的表 (x)
+//
+//
+//        return detailTo;
+        return null;
     }
+
 
     @Override
     public BigDecimal get1010Price(Long skuId) {
         //查询实时价格
         BigDecimal price = skuInfoMapper.getRealPrice(skuId);
         return price;
+    }
+
+    /**
+     * 获取SkuInfo(基本数据)的信息
+     *
+     * @param skuId
+     * @return
+     */
+    @Override
+    public SkuInfo getDetailSkuInfo(Long skuId) {
+        //0、查询到商品的基本信息 skuInfo
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        return skuInfo;
+    }
+
+    /**
+     * 查询sku的图片信息
+     *
+     * @param skuId
+     * @return
+     */
+    @Override
+    public List<SkuImage> getDetailSkuImages(Long skuId) {
+
+        List<SkuImage> imageList = skuImageService.getSkuImage(skuId);
+        return imageList;
     }
 }
 

@@ -1,8 +1,10 @@
 package com.atguigu.gmall.product.service.impl;
 
 
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.product.SpuSaleAttrValue;
+import com.atguigu.gmall.model.to.ValueSkuJsonTo;
 import com.atguigu.gmall.product.service.SpuSaleAttrService;
 import com.atguigu.gmall.product.mapper.SpuSaleAttrMapper;
 import com.atguigu.gmall.product.service.SpuSaleAttrValueService;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +70,30 @@ public class SpuSaleAttrServiceImpl extends ServiceImpl<SpuSaleAttrMapper, SpuSa
     public List<SpuSaleAttr> getSaleAttrAndValueMarkSku(Long spuId, Long skuId) {
         List<SpuSaleAttr>saleAttrList=spuSaleAttrMapper.getSaleAttrAndValueMarkSku(spuId,skuId);
         return saleAttrList;
+    }
+
+    /**
+     * 查询所有的sku销售属性组合可能 封装成指定的json返回
+     * @param spuId
+     * @return
+     */
+    @Override
+    public String getAllSkuSaleAttrValueJson(Long spuId) {
+        //将 52 xx|xx  转化成xx|xx 52
+        List<ValueSkuJsonTo> valueSkuJsonTos=spuSaleAttrMapper.getAllSkuValueJson(spuId);
+
+        Map<String,Long>map=new HashMap<>();
+        valueSkuJsonTos.forEach(valueSkuJsonTo->{
+            String valueJson = valueSkuJsonTo.getValueJson();
+            Long skuId = valueSkuJsonTo.getSkuId();
+
+            map.put(valueJson,skuId);
+
+        });
+
+        String valueJson = Jsons.toStr(map);
+
+        return valueJson;
     }
 }
 
