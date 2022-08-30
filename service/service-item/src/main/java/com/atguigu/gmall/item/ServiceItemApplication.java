@@ -10,6 +10,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @Date 2022/8/26 14:38
  * @Version 1.0
  */
+
 @EnableFeignClients
 @SpringCloudApplication
 @EnableThreadPool //

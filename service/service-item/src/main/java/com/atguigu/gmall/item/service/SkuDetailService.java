@@ -14,4 +14,7 @@ public interface SkuDetailService {
      * @return
      */
     SkuDetailTo getSkuDetail(Long skuId);
+
+
+
 }

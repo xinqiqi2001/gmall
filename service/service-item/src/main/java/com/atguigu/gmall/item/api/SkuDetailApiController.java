@@ -30,6 +30,8 @@ public class SkuDetailApiController {
 
         SkuDetailTo skuDetailTo=skuDetailService.getSkuDetail(skuId);
 
+//        skuDetailService.getCache(skuId);
+
         return Result.ok(skuDetailTo);
     }
 
