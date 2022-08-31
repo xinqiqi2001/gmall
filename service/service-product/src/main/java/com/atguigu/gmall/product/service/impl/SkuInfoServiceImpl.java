@@ -1,5 +1,6 @@
 package com.atguigu.gmall.product.service.impl;
 
+import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
@@ -8,10 +9,13 @@ import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
 import com.atguigu.gmall.product.service.*;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -36,12 +40,11 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     @Autowired
     SpuSaleAttrService spuSaleAttrService;
 
-    @Autowired
+    @Resource
     SkuInfoMapper skuInfoMapper;
 
     @Autowired
-    BaseCategory3Mapper baseCategory3Mapper;
-    //事务
+    RedissonClient redissonClient;
 
     /**
      * 保存sku
@@ -82,6 +85,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
         skuSaleAttrValueService.saveBatch(saleAttrValueList);
 
+        //数据库每新增一条数据 那么就把这个商品的id设置新布隆里面
+        RBloomFilter<Object> filter = redissonClient.getBloomFilter(SysRedisConst.BLOOM_SKUID);
+        filter.add(skuId);
     }
 
     /**
@@ -173,6 +179,17 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
         List<SkuImage> imageList = skuImageService.getSkuImage(skuId);
         return imageList;
+    }
+
+    /**
+     * 查询所有的商品id
+     * @return
+     */
+    @Override
+    public List<Long> findAllSkuId() {
+
+        return skuInfoMapper.getAllSkuId();
+
     }
 }
 

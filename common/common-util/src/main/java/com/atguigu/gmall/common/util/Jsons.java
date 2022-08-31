@@ -2,12 +2,10 @@ package com.atguigu.gmall.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.StringUtils;
 
-/**
- * @Author Xiaoxin
- * @Date 2022/8/28 15:33
- * @Version 1.0
- */
+import java.util.Map;
+
 public class Jsons {
     private static ObjectMapper mapper = new ObjectMapper();
     /**
@@ -26,27 +24,24 @@ public class Jsons {
     }
 
     /**
-     * 把json字符串转为对象
+     * 把json转为对象
      * @param jsonStr
      * @param clz
      * @param <T>
      * @return
      */
-    public static<T> T  toObj(String jsonStr, Class<T> clz) {
+    public static<T>  T toObj(String jsonStr, Class<T> clz) {
+        if(StringUtils.isEmpty(jsonStr)){
+            return null;
+        }
 
         T t = null;
         try {
             t = mapper.readValue(jsonStr, clz);
             return t;
-
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
         return null;
     }
 }
-
-
-
-
-

@@ -39,12 +39,19 @@ public class ItemController {
 
         if (result.isOk()) {
             SkuDetailTo skuDetailTo = result.getData();
-            model.addAttribute("categoryView", skuDetailTo.getCategoryView());
-            model.addAttribute("skuInfo", skuDetailTo.getSkuInfo());
-            BigDecimal price = skuDetailTo.getPrice();
-            model.addAttribute("price",price);
-            model.addAttribute("spuSaleAttrList",skuDetailTo.getSpuSaleAttrList());//spu的销售属性列表
-            model.addAttribute("valuesSkuJson",skuDetailTo.getValuesSkuJson());//json
+
+            if (skuDetailTo!=null || skuDetailTo.getSkuInfo()!=null){
+                model.addAttribute("categoryView", skuDetailTo.getCategoryView());
+                model.addAttribute("skuInfo", skuDetailTo.getSkuInfo());
+                BigDecimal price = skuDetailTo.getPrice();
+                model.addAttribute("price",price);
+                model.addAttribute("spuSaleAttrList",skuDetailTo.getSpuSaleAttrList());//spu的销售属性列表
+                model.addAttribute("valuesSkuJson",skuDetailTo.getValuesSkuJson());//json
+            }else {
+                //说明远程没有查到商品
+                return "item/404";
+            }
+
         }
 
 

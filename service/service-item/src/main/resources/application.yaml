@@ -20,7 +20,7 @@ app:
     keep-alive-time: 300
 
 
-# 暴露所有监控断电
+# 暴露所有监控端点
 management:
   endpoints:
     web:
