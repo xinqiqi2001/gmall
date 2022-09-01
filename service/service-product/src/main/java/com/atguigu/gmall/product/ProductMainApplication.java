@@ -10,6 +10,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 /**
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Import;
 @MapperScan("com.atguigu.gmall.product.mapper") //自动扫描这个包下的所有Mapper接口
 @SpringCloudApplication
 @EnableThreadPool //
+@EnableScheduling
 public class ProductMainApplication {
 
     public static void main(String[] args) {

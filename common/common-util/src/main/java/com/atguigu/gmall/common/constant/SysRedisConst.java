@@ -15,4 +15,6 @@ public class SysRedisConst {
 
     //布隆过滤器存id的
     public static final String BLOOM_SKUID = "bloom:skuid";
+
+    public static final String LOCK_PREFIX = "lock:";
 }

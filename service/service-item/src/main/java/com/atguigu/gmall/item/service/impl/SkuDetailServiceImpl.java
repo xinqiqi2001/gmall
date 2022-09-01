@@ -4,6 +4,7 @@ package com.atguigu.gmall.item.service.impl;
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.item.cache.CacheOpsService;
+import com.atguigu.gmall.item.cache.annotation.GmallCache;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -45,7 +46,7 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 
 
     /**
-     * 缓存优化前
+     * 缓存优化前查询商品详情
      */
     public SkuDetailTo getSkuDetailFromRpc(Long skuId) {
 
@@ -118,8 +119,14 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         return detailTo;
     }
 
-    @Override
-    public SkuDetailTo getSkuDetail(Long skuId) {
+    /**
+     *
+     * 加布隆过滤器和分布式锁
+     * @param skuId
+     * @return
+     */
+    public SkuDetailTo getSkuDetailWithCache(Long skuId) {
+
         String cacheKey = SysRedisConst.SKU_INFO_PREFIX + skuId;
         //1.先查缓存
         SkuDetailTo cacheData = cacheOpsService.getCacheData(cacheKey, SkuDetailTo.class);
@@ -161,5 +168,17 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         return cacheData;
     }
 
-
+    /**
+     * 将getSkuDetailWithCache()方法 用Aop抽取
+     * 代理的目标方法
+     * @param skuId
+     * @return
+     */
+    //表达式的$params代表方法的所有参数列表
+    @GmallCache(cacheKey =SysRedisConst.SKU_INFO_PREFIX+ "#{#params[0]}")
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+        SkuDetailTo fromRpc = this.getSkuDetailFromRpc(skuId);
+        return fromRpc;
+    }
 }

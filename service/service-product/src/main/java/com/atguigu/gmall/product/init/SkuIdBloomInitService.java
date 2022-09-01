@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * 容器启动成功以后，连上数据库，查到所有商品id。在布隆里面进行占位
+ * @author Xiaoxin
  */
 @Slf4j
 @Service
