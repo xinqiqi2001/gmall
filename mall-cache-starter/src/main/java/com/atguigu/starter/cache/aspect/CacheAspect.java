@@ -1,26 +1,24 @@
-package com.atguigu.gmall.item.cache.aspect;
+package com.atguigu.starter.cache.aspect;
 
-import com.atguigu.gmall.common.constant.SysRedisConst;
-import com.atguigu.gmall.item.cache.CacheOpsService;
-import com.atguigu.gmall.item.cache.annotation.GmallCache;
-import com.atguigu.gmall.model.to.SkuDetailTo;
-import javassist.bytecode.SignatureAttribute;
+
+
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.constant.SysRedisConst;
+import com.atguigu.starter.cache.service.CacheOpsService;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.*;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -44,9 +42,9 @@ public class CacheAspect {
     //编写通知方法
 
     //在标注了 @GmallCache注解的目标方法之前执行 测试
-    @Before("@annotation(com.atguigu.gmall.item.cache.annotation.GmallCache)")
+    @Before("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
     public void xxxx() {
-        //System.out.println("前置通知");生效
+        System.out.println("前置通知");
 
     }
 
@@ -65,7 +63,7 @@ public class CacheAspect {
      */
 
 
-    @Around("@annotation(com.atguigu.gmall.item.cache.annotation.GmallCache)")
+    @Around("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         //获取传来的第一个参数
 //        Object arg = joinPoint.getArgs()[0];
@@ -82,12 +80,16 @@ public class CacheAspect {
             //3缓存没有 准备回源
             //4询问布隆里是否存在
 //            boolean contains = cacheOpsService.bloomContains(arg);
+            //判断前端是否传来了指定的布隆名字
             String bloomName = determinBloomName(joinPoint);
             if(!StringUtils.isEmpty(bloomName)){
-                //开启了指定布隆
+                //传来了指定的布隆名字
+                //开启了指定布隆要存储的id
                 Object bVal = determinBloomValue(joinPoint);
+                //判断布隆里是否存在
                 boolean contains = cacheOpsService.bloomContains(bloomName,bVal);
                 if(!contains){
+                    //不存在直接返回null
                     return null;
                 }
             }
@@ -107,7 +109,7 @@ public class CacheAspect {
                 } else {
                     //6.2没获取到锁 证明可能有线程正在执行 睡1s然后查询缓存数据库
                     Thread.sleep(1000);
-                    return cacheOpsService.getCacheData(cacheKey, SkuDetailTo.class);
+                    return cacheOpsService.getCacheData(cacheKey, returnType);
                 }
 
             } finally {
@@ -209,7 +211,7 @@ public class CacheAspect {
      * @return
      */
     private Object determinBloomValue(ProceedingJoinPoint joinPoint) {
-        //1、拿到目标方法上的@GmallCache注解
+        //1、获取到目标方法上的@GmallCache注解
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 
         Method method = signature.getMethod();
@@ -242,7 +244,7 @@ public class CacheAspect {
         //lock-方法名
         String lockName = cacheAnnotation.lockName();
         if(StringUtils.isEmpty(lockName)){
-            //没指定锁用方法级别的锁
+            //没指定锁 用全局默认的
             return SysRedisConst.LOCK_PREFIX+method.getName();
         }
 

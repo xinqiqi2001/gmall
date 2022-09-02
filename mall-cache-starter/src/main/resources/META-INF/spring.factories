@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.atguigu.starter.cache.MallCacheAutoConfiguration
+#??????

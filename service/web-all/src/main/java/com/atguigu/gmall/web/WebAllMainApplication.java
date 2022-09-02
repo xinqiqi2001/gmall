@@ -12,8 +12,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @Version 1.0
  */
 
+@EnableFeignClients(basePackages = {
+        "com.atguigu.gmall.feign.item",
+        "com.atguigu.gmall.feign.product"
+}) //只会扫描主程序所在的子包
 @SpringCloudApplication
-@EnableFeignClients
 public class WebAllMainApplication {
     public static void main(String[] args) {
         SpringApplication.run(WebAllMainApplication.class,args);
