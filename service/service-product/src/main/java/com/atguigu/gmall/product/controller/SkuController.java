@@ -1,6 +1,8 @@
 package com.atguigu.gmall.product.controller;
 
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.feign.search.SearchFeignClient;
+import com.atguigu.gmall.model.list.Goods;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.product.service.SkuInfoService;
 import com.atguigu.gmall.product.service.SpuImageService;
@@ -26,6 +28,8 @@ public class SkuController {
 
     @Autowired
     SkuInfoService skuInfoService;
+
+
 
 
     /**
@@ -63,12 +67,12 @@ public class SkuController {
     @ApiOperation("上架")
     @GetMapping("onSale/{skuId}")
     public Result onSale(@PathVariable Long skuId){
-        //通过skuId获取SkuInfo 将SkuInfo的IsSale属性设置为1
-        SkuInfo skuInfo = skuInfoService.getOne(new LambdaQueryWrapper<SkuInfo>().eq(SkuInfo::getId, skuId));
-        skuInfo.setIsSale(1);
-        skuInfoService.updateById(skuInfo);
+
+        skuInfoService.onSale(skuId);
         return Result.ok();
     }
+
+
 
     /**
      * 1为上架 0为下架
@@ -79,10 +83,8 @@ public class SkuController {
     @ApiOperation("下架")
     @GetMapping("cancelSale/{skuId}")
     public Result cancelSale(@PathVariable Long skuId){
-        //通过skuId获取SkuInfo 将SkuInfo的IsSale属性设置为0
-        SkuInfo skuInfo = skuInfoService.getOne(new LambdaQueryWrapper<SkuInfo>().eq(SkuInfo::getId, skuId));
-        skuInfo.setIsSale(0);
-        skuInfoService.updateById(skuInfo);
+
+        skuInfoService.cancelSale(skuId);
         return Result.ok();
     }
 }

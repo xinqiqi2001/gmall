@@ -1,6 +1,9 @@
 package com.atguigu.gmall.product.service.impl;
 
 import com.atguigu.gmall.common.constant.SysRedisConst;
+import com.atguigu.gmall.feign.search.SearchFeignClient;
+import com.atguigu.gmall.model.list.Goods;
+import com.atguigu.gmall.model.list.SearchAttr;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
@@ -8,6 +11,7 @@ import com.atguigu.gmall.model.to.ValueSkuJsonTo;
 import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
 import com.atguigu.gmall.product.service.*;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,12 +45,22 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     @Autowired
     SpuSaleAttrService spuSaleAttrService;
 
+    @Autowired
+    SkuInfoService skuInfoService;
+
     @Resource
     SkuInfoMapper skuInfoMapper;
 
     @Autowired
     RedissonClient redissonClient;
 
+    @Autowired
+    BaseTrademarkService baseTrademarkService;
+
+    @Resource
+    BaseCategory3Mapper baseCategory3Mapper;
+    @Autowired
+    SearchFeignClient searchFeignClient;
     /**
      * 保存sku
      *
@@ -191,6 +206,85 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         return skuInfoMapper.getAllSkuId();
 
     }
+
+    /**
+     * 上架商品
+     * @param skuId
+     */
+    @Override
+    public void onSale(Long skuId) {
+        //通过skuId获取SkuInfo 将SkuInfo的IsSale属性设置为1
+        SkuInfo skuInfo = skuInfoService.getOne(new LambdaQueryWrapper<SkuInfo>().eq(SkuInfo::getId, skuId));
+        skuInfo.setIsSale(1);
+        skuInfoService.updateById(skuInfo);
+
+        //将商品保存到es中
+        Goods goods = getGoodsBySkuId(skuId);
+        searchFeignClient.saveGoods(goods);
+    }
+
+    /**
+     * 下架商品
+     * @param skuId
+     */
+    @Override
+    public void cancelSale(Long skuId) {
+        //通过skuId获取SkuInfo 将SkuInfo的IsSale属性设置为0
+        SkuInfo skuInfo = skuInfoService.getOne(new LambdaQueryWrapper<SkuInfo>().eq(SkuInfo::getId, skuId));
+        skuInfo.setIsSale(0);
+        //将指定商品从es中删除
+        searchFeignClient.deleteGoods(skuId);
+        skuInfoService.updateById(skuInfo);
+    }
+
+    /**
+     * 获取到需要存储到es中的商品的所有数据  条件是商品是上架状态
+     * @param skuId
+     * @return
+     */
+    @Override
+    public Goods getGoodsBySkuId(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+
+        Goods goods=new Goods();
+        goods.setId(skuId);
+        goods.setDefaultImg(skuInfo.getSkuDefaultImg());
+        goods.setTitle(skuInfo.getSkuName());
+        goods.setPrice(skuInfo.getPrice().doubleValue());
+        goods.setCreateTime(new Date());
+        goods.setTmId(skuInfo.getTmId());
+        //-------------
+
+        //获取品牌的信息  skuInfo里只保存了品牌id
+        BaseTrademark trademark = baseTrademarkService.getById(skuInfo.getTmId());
+
+        goods.setTmName(trademark.getTmName());
+        goods.setTmLogoUrl(trademark.getLogoUrl());
+        //只有三级分类id  根据三级分类id获取二级分类id和一级分类id和Name
+        Long category3Id = skuInfo.getCategory3Id();
+        CategoryViewTo categoryView = baseCategory3Mapper.getCategoryView(category3Id);
+
+        goods.setCategory1Id(categoryView.getCategory1Id());
+        goods.setCategory1Name(categoryView.getCategory1Name());
+        goods.setCategory2Id(categoryView.getCategory2Id());
+        goods.setCategory2Name(categoryView.getCategory2Name());
+        goods.setCategory3Id(categoryView.getCategory3Id());
+        goods.setCategory3Name(categoryView.getCategory3Name());
+
+        //设置热度分
+        //未来要做热度分更新 点击一次 热度分+1
+        goods.setHotScore(0L);
+
+        //查当前sku所有平台属性名和值
+        List<SearchAttr> attrs=skuAttrValueService.getSkuAttrNameAndValueName(skuId);
+        goods.setAttrs(attrs);
+
+
+
+        return goods;
+    }
+
+
 }
 
 

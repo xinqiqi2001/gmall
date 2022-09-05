@@ -1,8 +1,11 @@
 package com.atguigu.gmall.product.mapper;
 
 
+import com.atguigu.gmall.model.list.SearchAttr;
 import com.atguigu.gmall.model.product.SkuAttrValue;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author Xiaoxin
@@ -12,6 +15,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface SkuAttrValueMapper extends BaseMapper<SkuAttrValue> {
 
+    /**
+     * 根据SkuId查当前sku所有平台属性名和值
+     * @param skuId
+     * @return
+     */
+    List<SearchAttr> getSkuAttrNameAndValueName(Long skuId);
 }
 
 

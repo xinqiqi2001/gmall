@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product.service;
 
 
+import com.atguigu.gmall.model.list.Goods;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
@@ -55,4 +56,24 @@ public interface SkuInfoService extends IService<SkuInfo> {
      * @return
      */
     List<Long> findAllSkuId();
+
+    /**
+     * 得到某个商品(sku)需要存储到es中的所有数据
+     * 将在上架状态时的商品保存到es
+     * @param skuId
+     * @return
+     */
+    Goods getGoodsBySkuId(Long skuId);
+
+    /**
+     * 上架商品
+     * @param skuId
+     */
+    void onSale(Long skuId);
+
+    /**
+     * 下架商品
+     * @param skuId
+     */
+    void cancelSale(Long skuId);
 }

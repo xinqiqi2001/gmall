@@ -41,12 +41,6 @@ public class CacheAspect {
 
     //编写通知方法
 
-    //在标注了 @GmallCache注解的目标方法之前执行 测试
-    @Before("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
-    public void xxxx() {
-        System.out.println("前置通知");
-
-    }
 
     /**
      * 环绕通知
@@ -61,7 +55,6 @@ public class CacheAspect {
      * }
      * 在代理对象可以魔改任何东西 例如返回值,方法参数
      */
-
 
     @Around("@annotation(com.atguigu.starter.cache.annotation.GmallCache)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -253,33 +246,5 @@ public class CacheAspect {
         return lockNameVal;
     }
 
-    //@Around("@annotation(com.atguigu.gmall.item.cache.annotation.GmallCache)")
-    public Object aroundtest(ProceedingJoinPoint joinPoint) {
-        //1.获取切面签名  将要执行的目标方法的签名
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        //2.获取这个目标方法的传来的所有参数
-        Object[] args = joinPoint.getArgs();
 
-        //3.放行目标方法
-        //joinPoint.proceed(args);第一种方法
-        Method method = signature.getMethod();
-
-        Object result = null;
-        try {
-            //joinPoint.getTarget()执行这个类的所有方法
-            //目标方法执行完之后返回一个返回值
-            result = method.invoke(joinPoint.getTarget(), args);
-            //返回通知
-        } catch (Exception e) {
-            // 遇见异常不能在这里处理 继续往上抛出
-            // 因为在这个代理对象上面可能还有代理对象 在这里处理掉之后 上面的代理对象就感知不到这个异常了
-            // e.printStackTrace();
-            throw new RuntimeException();
-            //异常通知
-        } finally {
-            //后置通知
-        }
-
-        return result;
-    }
 }

@@ -32,6 +32,7 @@ public class Goods {
     @Field(type = FieldType.Date,format = DateFormat.custom,pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime; // 新品
 
+
     @Field(type = FieldType.Long)
     private Long tmId;
 
