@@ -29,4 +29,11 @@ public interface GoodsService {
      * @return
      */
     SearchResponseVo search(SearchParamVo paramVo);
+    /**
+     * 更新热度分
+     * @param skuId
+     * @param score 商品最新的得分
+     * @return
+     */
+    void updateHotScore(Long skuId, Long score);
 }

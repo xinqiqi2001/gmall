@@ -23,6 +23,7 @@ public class SkuDetailApiController {
     @Autowired
     SkuDetailService skuDetailService;
 
+
     @GetMapping("/skudetail/{skuId}")
     public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) {
         // 远程查询出商品的详细信息
@@ -30,6 +31,9 @@ public class SkuDetailApiController {
 
         SkuDetailTo skuDetailTo=skuDetailService.getSkuDetail(skuId);
 
+        //更新热度分
+        //更新热度分。攒一批更新一下。 100
+        skuDetailService.updateHotScore(skuId);
         return Result.ok(skuDetailTo);
     }
 

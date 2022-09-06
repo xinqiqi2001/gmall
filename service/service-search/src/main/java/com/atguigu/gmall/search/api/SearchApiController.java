@@ -8,6 +8,8 @@ import com.atguigu.gmall.search.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @Author Xiaoxin
  * @Date 2022/9/5 12:26
@@ -49,6 +51,26 @@ public class SearchApiController {
     public Result<SearchResponseVo> search(@RequestBody SearchParamVo paramVo){
         SearchResponseVo responseVo = goodsService.search(paramVo);
         return Result.ok(responseVo);
+    }
+
+    /**
+     * 更新热度分
+     * @param skuId
+     * @param score 商品最新的得分
+     * @return
+     */
+    @GetMapping("/goods/hotscore/{skuId}")
+    public Result updateHotScore(@PathVariable("skuId") Long skuId,
+                                 @RequestParam("score") Long score,
+                                 HttpServletResponse response){
+        goodsService.updateHotScore(skuId,score);
+
+        /**
+         * 会话Cookie；
+         * 1)、默认当前会话有效。只要浏览器关闭就销毁
+         * 2)、每个 Cookie 都有自己的作用域范围。
+         */
+        return Result.ok();
     }
 
 

@@ -12,9 +12,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @Version 1.0
  */
 
-@EnableThreadPool //
+@EnableThreadPool
 @EnableFeignClients(basePackages = {
-        "com.atguigu.gmall.feign.product"
+        "com.atguigu.gmall.feign.product",
+        "com.atguigu.gmall.feign.search"
 })
 @SpringCloudApplication
 public class ServiceItemApplication {

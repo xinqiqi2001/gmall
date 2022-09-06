@@ -5,16 +5,14 @@ import com.atguigu.gmall.model.list.Goods;
 import com.atguigu.gmall.model.vo.search.SearchParamVo;
 import com.atguigu.gmall.model.vo.search.SearchResponseVo;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author Xiaoxin
  * @Date 2022/9/5 12:37
  * @Version 1.0
  */
+
 @RequestMapping("/api/inner/rpc/search")
 @FeignClient("service-search")
 public interface SearchFeignClient {
@@ -43,4 +41,13 @@ public interface SearchFeignClient {
     Result<SearchResponseVo> search(@RequestBody SearchParamVo searchParamVo);
 
 
+    /**
+     * 按热度更新 攒100更新一次
+     * @param skuId
+     * @param score
+     * @return
+     */
+    @GetMapping("/goods/hotscore/{skuId}")
+    Result updateHotScore(@PathVariable("skuId") Long skuId,
+                          @RequestParam("score") Long score);
 }

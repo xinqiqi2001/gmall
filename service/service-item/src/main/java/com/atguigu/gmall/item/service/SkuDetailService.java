@@ -16,5 +16,9 @@ public interface SkuDetailService {
     SkuDetailTo getSkuDetail(Long skuId);
 
 
-
+    /**
+     * 更新热度分
+     * @param skuId
+     */
+    void updateHotScore(Long skuId);
 }

@@ -4,6 +4,7 @@ package com.atguigu.gmall.item.service.impl;
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.feign.product.SkuProductFeignClient;
+import com.atguigu.gmall.feign.search.SearchFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
@@ -178,11 +179,25 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @GmallCache(cacheKey =SysRedisConst.SKU_INFO_PREFIX+ "#{#params[0]}",
             bloomName = SysRedisConst.BLOOM_SKUID,
             bloomValue = "#{#params[0]}",
-            lockName = SysRedisConst.LOCK_SKU_DETAIL+"#{#params[0]}"
+            lockName = SysRedisConst.LOCK_SKU_DETAIL+"#{#params[0]}",
+            ttl = 60 * 60 *24*7
     )
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
         SkuDetailTo fromRpc = this.getSkuDetailFromRpc(skuId);
         return fromRpc;
+    }
+
+    @Autowired
+    SearchFeignClient searchFeignClient;
+    @Override
+    public void updateHotScore(Long skuId) {
+        //redis统计得分
+        Long increment = redisTemplate.opsForValue()
+                .increment(SysRedisConst.SKU_HOTSCORE_PREFIX + skuId);
+        if(increment % 100 ==0){
+            //累积到一定量更新es
+            searchFeignClient.updateHotScore(skuId,increment);
+        }
     }
 }
