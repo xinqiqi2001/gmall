@@ -283,8 +283,8 @@ public class GoodsServiceImpl implements GoodsService {
                 //一个SearchAttr 代表一个属性面包屑
                 SearchAttr searchAttr = new SearchAttr();
                 searchAttr.setAttrId(Long.valueOf(split[0]));
-                searchAttr.setAttrName(split[1]);
-                searchAttr.setAttrValue(split[2]);
+                searchAttr.setAttrValue(split[1]);
+                searchAttr.setAttrName(split[2]);
                 //因为面包屑需要一个list集合 所以需要将它放入一个list集合
                 propsParamList.add(searchAttr);
             }

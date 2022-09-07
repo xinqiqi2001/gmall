@@ -29,7 +29,7 @@ public class SkuDetailApiController {
         // 远程查询出商品的详细信息
         //TODO 商品详情需要远程调用service-product服务
 
-        SkuDetailTo skuDetailTo=skuDetailService.getSkuDetail(skuId);
+        SkuDetailTo skuDetailTo=skuDetailService. getSkuDetail(skuId);
 
         //更新热度分
         //更新热度分。攒一批更新一下。 100

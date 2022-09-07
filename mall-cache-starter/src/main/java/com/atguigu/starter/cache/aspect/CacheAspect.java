@@ -96,8 +96,9 @@ public class CacheAspect {
                     //6.1获取到锁  回源
                     //执行这个目标方法里的调用的方法
                     result = joinPoint.proceed(joinPoint.getArgs());
+                    long ttl = determinTtl(joinPoint);
                     //7.调用成功 重新保存进redis数据库
-                    cacheOpsService.saveData(cacheKey, result);
+                    cacheOpsService.saveData(cacheKey, result,ttl);
                     return result;
                 } else {
                     //6.2没获取到锁 证明可能有线程正在执行 睡1s然后查询缓存数据库
@@ -116,6 +117,19 @@ public class CacheAspect {
         }
         //缓存中有直接返回
         return cacheData;
+    }
+
+    private long determinTtl(ProceedingJoinPoint joinPoint) {
+        //1、拿到目标方法上的@GmallCache注解
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+
+        Method method = signature.getMethod();
+
+        //2、拿到注解
+        GmallCache cacheAnnotation = method.getDeclaredAnnotation(GmallCache.class);
+
+        long ttl = cacheAnnotation.ttl();
+        return ttl;
     }
 
     /**

@@ -174,6 +174,7 @@ public class SkuDetailServiceImpl implements SkuDetailService {
      * 代理的目标方法
      * @param skuId
      * @return
+     *
      */
     //表达式的$params代表方法的所有参数列表
     @GmallCache(cacheKey =SysRedisConst.SKU_INFO_PREFIX+ "#{#params[0]}",

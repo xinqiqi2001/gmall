@@ -20,6 +20,11 @@ public class UserController {
     @Autowired
     UserInfoService userInfoService;
 
+    /**
+     * 登录(验证登录信息是否正确)
+     * @param userInfo
+     * @return
+     */
     @PostMapping("/passport/login")
     public Result login(@RequestBody UserInfo userInfo) {
 

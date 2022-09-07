@@ -115,6 +115,23 @@ public class CacheOpsServiceImpl implements CacheOpsService {
     }
 
     @Override
+    public void saveData(String cacheKey, Object fromRpc, Long dataTtl) {
+        if(fromRpc == null){
+            //null值缓存短一点时间
+            redisTemplate.opsForValue().set(cacheKey,
+                    SysRedisConst.NULL_VAL,
+                    SysRedisConst.NULL_VAL_TTL,
+                    TimeUnit.SECONDS);
+        }else {
+            String str = Jsons.toStr(fromRpc);
+            redisTemplate.opsForValue().set(cacheKey,
+                    str,
+                    dataTtl,
+                    TimeUnit.SECONDS);
+        }
+    }
+
+    @Override
     public void unlock(Long skuId) {
         String lockKey = SysRedisConst.LOCK_SKU_DETAIL + skuId;
         RLock lock = redissonClient.getLock(lockKey);

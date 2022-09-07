@@ -61,6 +61,13 @@ public interface CacheOpsService {
      * @param fromRpc
      */
     void saveData(String cacheKey, Object fromRpc);
+    /**
+     * 以秒
+     * @param cacheKey
+     * @param fromRpc
+     * @param dataTtl
+     */
+    void saveData(String cacheKey, Object fromRpc,Long dataTtl);
 
     /**
      * 解锁
