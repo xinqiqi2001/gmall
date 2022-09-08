@@ -31,16 +31,28 @@ spring:
           predicates:  #断言
             - Path=/admin/product/**
 
+
+        - id: incr_route
+          uri: lb://service-item
+          predicates:
+            - Path=/lock/incr
+
         - id: user_route
           uri: lb://service-user
           predicates:
             - Path=/api/user/**
 
+        - id: cart_router
+          uri: lb://service-cart
+          predicates:
+            - Path=/api/cart/**
+
 
         - id: web_all_route
           uri: lb://web-all
-          predicates: #断言
+          predicates:
             - Host=**.gmall.com
+
 
 
 app:

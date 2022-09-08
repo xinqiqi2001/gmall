@@ -27,19 +27,41 @@ public class CartController {
     @GetMapping("/addCart.html")
     public String addCarthtml(@RequestParam("skuId") Long skuId,
                               @RequestParam("skuNum") Integer skuNum,
-                              @RequestHeader(SysRedisConst.USERID_HEADER)String userId,
+
                               Model model) {
-        System.out.println("获取到了用户id："+userId);
 
 
         //添加指定商品进购物车
-        Result<SkuInfo> result = cartFeignClient.addToCart(skuId, skuNum);
-
         //存入共享域中
-        model.addAttribute("skuInfo",result.getData());
-        model.addAttribute("skuNum",skuNum);
 
-        return "cart/addCart";
+        Result<Object> result = cartFeignClient.addToCart(skuId, skuNum);
+        if (result.isOk()) {
+            model.addAttribute("skuInfo",result.getData());
+            model.addAttribute("skuNum",skuNum);
+            return "cart/addCart";
+        }else {
+            model.addAttribute("msg",result.getData());
+            return "cart/error";
+        }
+
+    }
+
+    /**
+     * 跳转到购物车列表
+     * @return
+     */
+    @GetMapping("/cart.html")
+    public String cartHtml(){
+
+        return "cart/index";
+    }
+
+
+    @GetMapping("/cart/deleteChecked")
+    public String deleteChecked(){
+
+        cartFeignClient.deleteChecked();
+        return "redirect:http://cart.gmall.com/cart.html";
     }
 
 }

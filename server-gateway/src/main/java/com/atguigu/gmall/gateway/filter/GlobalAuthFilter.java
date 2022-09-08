@@ -77,23 +77,23 @@ public class GlobalAuthFilter implements GlobalFilter {
         for (String url : urlProperties.getLoginAuthUrl()) {
             boolean match = matcher.match(url, path);
             //判断是否拿到了令牌(token)
-            if(match){
+            if (match) {
                 //登录校验
                 //4.1获取token的信息【Cookie[token=xxx]】【Header[token=xxx]】
                 String tokenValue = getTokenValue(exchange);
                 //4.2校验token
                 UserInfo info = getTokenUserInfo(tokenValue);
                 //4.3判断用户信息是否正常
-                if (info!=null){
+                if (info != null) {
                     //说明在redis中查到了指定用户 exchange的request头中新增一个userid
 
-                    ServerWebExchange webExchange = userIdTransport(info, exchange);
+                    ServerWebExchange webExchange = userIdOrTempIdTransport(info, exchange);
                     return chain.filter(webExchange);
 
-                }else {
+                } else {
                     //redis中无此用户 [假令牌 token没有  没登录 ]
                     //重定向到自定义页面  此次响应加载一个状态码 响应结束
-                    return redirectToCustomPage(urlProperties.getLoginPage()+"?originUrl="+uri,exchange);
+                    return redirectToCustomPage(urlProperties.getLoginPage() + "?originUrl=" + uri, exchange);
                 }
 
 
@@ -102,22 +102,20 @@ public class GlobalAuthFilter implements GlobalFilter {
 
         //走到这说明是一个普通请求 放行 既不是静态资源直接放行 也不是必须要登录的
         String tokenValue = getTokenValue(exchange);
-        UserInfo tokenUserInfo = getTokenUserInfo(tokenValue);
-        if (tokenUserInfo!=null){
-            exchange=userIdTransport(tokenUserInfo, exchange);
-        }else {
+        UserInfo info = getTokenUserInfo(tokenValue);
+        if (!StringUtils.isEmpty(tokenValue) && info==null){
+            //前端带来了token  但是根据这个token没有查到数据 说明是假token  重定向到登录
             //如果前端带了token，还是没用户信息，代表这是假令牌
-            if(!StringUtils.isEmpty(tokenValue)){
-                //重定向到登录. 可以不带token,要带就得带正确
-                return redirectToCustomPage(urlProperties.getLoginPage()+"?originUrl="+uri,exchange);
-            }
+            return redirectToCustomPage(urlProperties.getLoginPage() + "?originUrl=" + uri, exchange);
         }
-
+        //
+        exchange=userIdOrTempIdTransport(info,exchange);
         return chain.filter(exchange);
     }
 
     /**
      * 重定向到自定义页面
+     *
      * @param
      * @param exchange
      * @return
@@ -129,7 +127,7 @@ public class GlobalAuthFilter implements GlobalFilter {
         //1、重定向 设置响应状态码302【302状态码 + 响应头中 Location: 新位置】
         response.setStatusCode(HttpStatus.FOUND);
         // http://passport.gmall.com/login.html?originUrl=http://gmall.com/
-        response.getHeaders().add(HttpHeaders.LOCATION,location);
+        response.getHeaders().add(HttpHeaders.LOCATION, location);
 
         //2、清除旧的错误的Cookie[token]（同名cookie并max-age=0）解决无限重定向问题
         //更新token的声明周期 maxAge(0) 立即死亡  .domain(".gmall.com") 指定作用域的token
@@ -139,41 +137,64 @@ public class GlobalAuthFilter implements GlobalFilter {
                 .path("/")
                 .domain(".gmall.com")
                 .build();
-        response.getCookies().set("token",tokenCookie);
+        response.getCookies().set("token", tokenCookie);
 
         //3、响应结束
         return response.setComplete();
     }
 
     /**
-     * request的头会新增一个userid
+     * request的头会新增一个userid和 一个临时id  userTempId
      * 用户id透传
+     *
      * @param info
      * @param exchange
      * @return
      */
-    private ServerWebExchange userIdTransport(UserInfo info, ServerWebExchange exchange) {
-        if(info != null){
-            //请求一旦发来，所有的请求数据是固定的，不能进行任何修改，只能读取
-            ServerHttpRequest request = exchange.getRequest();
+    private ServerWebExchange userIdOrTempIdTransport(UserInfo info, ServerWebExchange exchange) {
+        //请求一旦发来，所有的请求数据是固定的，不能进行任何修改，只能读取
+        ServerHttpRequest.Builder newReqbuilder = exchange.getRequest().mutate();
 
-            //根据原来的请求，封装一个新情求
-            ServerHttpRequest newReq = exchange.getRequest()
-                    .mutate() //变一个新的
-                    .header(SysRedisConst.USERID_HEADER, info.getId().toString())
-                    .build();//添加自己的头
-
-
-            //放行的时候传改掉的exchange
-            ServerWebExchange webExchange = exchange
-                    .mutate()
-                    .request(newReq)
-                    .response(exchange.getResponse())
-                    .build();
-
-            return webExchange;
+        //判断用户是不是登录状态
+        if (info != null) {
+            //用户登录了 透传用户id
+            newReqbuilder.header(SysRedisConst.USERID_HEADER, info.getId().toString());
         }
-        return exchange;
+        //用户没登录 透传临时用户id
+        String userTempId = getUserTempId(exchange);
+        newReqbuilder.header(SysRedisConst.USERTEMPID_HEADER, userTempId);
+
+
+        //放行的时候传改掉的exchange
+        ServerWebExchange webExchange = exchange
+                .mutate()
+                .request(newReqbuilder.build())
+                .response(exchange.getResponse())
+                .build();
+
+        return webExchange;
+    }
+
+    /**
+     * 透传临时用户id
+     * 获取当前未登录临时用户id
+     *
+     * @param exchange
+     * @return
+     */
+    private String getUserTempId(ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        //1.尝试获取头中的临时用户id
+        String TempId = request.getHeaders().getFirst("userTempId");
+        if (StringUtils.isEmpty(TempId)) {
+
+            //2.到这说明上面没有获取到  尝试获取cookie中的临时用户id
+            HttpCookie httpCookie = request.getCookies().getFirst("userTempId");
+            if (httpCookie!=null){
+                TempId= httpCookie.getValue();
+            }
+        }
+        return TempId;
     }
 
     /**
@@ -184,8 +205,8 @@ public class GlobalAuthFilter implements GlobalFilter {
      */
     private UserInfo getTokenUserInfo(String tokenValue) {
         String json = redisTemplate.opsForValue().get(SysRedisConst.LOGIN_USER + tokenValue);
-        if(!StringUtils.isEmpty(json)){
-            return Jsons.toObj(json,UserInfo.class);
+        if (!StringUtils.isEmpty(json)) {
+            return Jsons.toObj(json, UserInfo.class);
         }
         return null;
     }
@@ -203,7 +224,7 @@ public class GlobalAuthFilter implements GlobalFilter {
         HttpCookie token = exchange.getRequest()
                 .getCookies()
                 .getFirst("token");
-        if(token != null){
+        if (token != null) {
             tokenValue = token.getValue();
             return tokenValue;
         }

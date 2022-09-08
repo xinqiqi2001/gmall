@@ -20,6 +20,14 @@ public interface CartFeignClient {
      * 将商品添加到购物车 方法
      */
     @GetMapping("/addToCart")
-    Result<SkuInfo> addToCart(@RequestParam("skuId") Long skuId,
+    Result<Object> addToCart(@RequestParam("skuId") Long skuId,
                               @RequestParam("num") Integer num);
+
+    /**
+     * 删除指定购物车中选中商品
+     * @return
+     */
+    @GetMapping("/deleteChecked")
+    Result deleteChecked();
+
 }

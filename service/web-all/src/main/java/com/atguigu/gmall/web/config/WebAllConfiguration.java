@@ -2,13 +2,16 @@ package com.atguigu.gmall.web.config;
 
 
 import com.atguigu.gmall.common.constant.SysRedisConst;
+import com.atguigu.gmall.model.cart.CartInfo;
 import feign.RequestInterceptor;
+import lombok.Data;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 @Configuration
 public class WebAllConfiguration {
@@ -28,9 +31,13 @@ public class WebAllConfiguration {
             HttpServletRequest request = attributes.getRequest();
             String userId = request.getHeader(SysRedisConst.USERID_HEADER);
 
+            String userTempId = request.getHeader(SysRedisConst.USERTEMPID_HEADER);
+
             //用户id头添加到feign的新情求中
             template.header(SysRedisConst.USERID_HEADER,userId);
 
+            //将临时id也添加进去
+            template.header(SysRedisConst.USERTEMPID_HEADER,userTempId);
         };
     }
 
