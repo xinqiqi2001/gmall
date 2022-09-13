@@ -1,0 +1,15 @@
+server:
+  port: 13000
+spring:
+  profiles:
+    include: sharding
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    username: root
+    password: root
+    url: jdbc:mysql://192.168.6.200:3306/gmall_order?useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+app:
+  ware-url: http://localhost:9001/

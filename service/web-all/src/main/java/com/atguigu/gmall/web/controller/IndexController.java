@@ -29,7 +29,7 @@ public class IndexController {
 
         if (allCategoryWithTree.isOk()) {
             //远程调用成功
-            //TODO 查询出所有菜单
+            // 查询出所有菜单
             List<CategoryTreeTo> data = allCategoryWithTree.getData();
             model.addAttribute("list",data);
         }

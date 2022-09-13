@@ -27,7 +27,6 @@ public class SkuDetailApiController {
     @GetMapping("/skudetail/{skuId}")
     public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId") Long skuId) {
         // 远程查询出商品的详细信息
-        //TODO 商品详情需要远程调用service-product服务
 
         SkuDetailTo skuDetailTo=skuDetailService. getSkuDetail(skuId);
 

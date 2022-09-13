@@ -52,7 +52,6 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     public SkuDetailTo getSkuDetailFromRpc(Long skuId) {
 
         SkuDetailTo detailTo = new SkuDetailTo();
-        //TODO 远程分步查询出商品的详细信息
 
         //1、查基本信息
         CompletableFuture<SkuInfo> skuInfoFuture = CompletableFuture.supplyAsync(() -> {

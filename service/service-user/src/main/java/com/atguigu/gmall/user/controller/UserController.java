@@ -6,7 +6,10 @@ import com.atguigu.gmall.model.user.UserInfo;
 import com.atguigu.gmall.model.vo.user.LoginSuccessVo;
 import com.atguigu.gmall.user.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * @Author Xiaoxin
@@ -47,4 +50,6 @@ public class UserController {
         userInfoService.logout(token);
         return Result.ok();
     }
+
+
 }

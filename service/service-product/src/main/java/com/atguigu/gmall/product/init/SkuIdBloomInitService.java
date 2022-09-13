@@ -31,7 +31,7 @@ public class SkuIdBloomInitService {
     RedissonClient redissonClient;
 
 
-    //TODO 布隆只能增，不能删除商品，如果真的数据库删除了商品，布隆怎么办？
+    //布隆只能增，不能删除商品，如果真的数据库删除了商品，布隆怎么办？
     //      布隆重建。
 
     /**

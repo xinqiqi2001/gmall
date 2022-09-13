@@ -90,4 +90,10 @@ public interface CartService {
      */
     void mergeUserAndTempCart();
 
+    /**
+     * 更新购物车中商品价格
+     * @param cartKey
+     */
+    void updateCartAllItemsPrice(String cartKey);
+
 }

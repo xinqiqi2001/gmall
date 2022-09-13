@@ -114,7 +114,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
      */
     @Override
     public SkuDetailTo getSkuDetail(Long skuId) {
-//        //TODO 最后将这个方法里的其他方法拆分成其他方法
+//        /最后将这个方法里的其他方法拆分成其他方法
 //
 //        SkuDetailTo detailTo = new SkuDetailTo();
 //        //0、查询到商品的基本信息 skuInfo  v
@@ -139,7 +139,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 //        BigDecimal price = get1010Price(skuId);
 //        detailTo.setPrice(price);
 //
-//        //TODO 改写这个了 4、商品（sku）所属的SPU当时定义的所有销售属性名值组合（按固定的排序展示）。
+//         改写这个了 4、商品（sku）所属的SPU当时定义的所有销售属性名值组合（按固定的排序展示）。
 //        //          spu_sale_attr、spu_sale_attr_value
 //        //          并标识出当前sku到底spu的那种组合，页面要有高亮框 sku_sale_attr_value
 //        //查询当前sku对应的spu定义的所有销售属性名和值（固定好顺序）并且标记好当前sku属于哪一种组合
