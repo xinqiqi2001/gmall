@@ -13,27 +13,31 @@ import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.execption.GmallException;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.common.utiles.AuthUtils;
+import com.atguigu.gmall.constant.MqConst;
 import com.atguigu.gmall.feign.cart.CartFeignClient;
 import com.atguigu.gmall.feign.product.SkuProductFeignClient;
 import com.atguigu.gmall.feign.user.UserFeignClient;
 import com.atguigu.gmall.feign.ware.WareFeignClient;
 import com.atguigu.gmall.model.cart.CartInfo;
+import com.atguigu.gmall.model.enums.ProcessStatus;
+import com.atguigu.gmall.model.to.mq.OrderMsg;
 import com.atguigu.gmall.model.user.UserAddress;
 import com.atguigu.gmall.model.vo.order.CartInfoVo;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.atguigu.gmall.model.vo.user.UserAuthInfo;
 import com.atguigu.gmall.order.service.OrderInfoService;
-import com.google.common.collect.Lists;
 
 import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
 import com.atguigu.gmall.order.biz.OrderBizService;
+import org.jooq.JSON;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitTemplateConfigurer;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 /**
  * @Author Xiaoxin
  * @Date 2022/9/13 18:54
@@ -61,9 +65,12 @@ public class OrderBizServiceImpl implements OrderBizService {
     @Autowired
     OrderInfoService orderInfoService;
 
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 
     /**
-     * Result<OrderConfirmDataVo>
+     * 获取订单页所需要的全部数据
+     * (订购物车中选中的商品信息,商品的总数量,总金额,收货地址列表)
      *
      * @return
      */
@@ -99,6 +106,7 @@ public class OrderBizServiceImpl implements OrderBizService {
 
         orderConfirmDataVo.setTotalNum(totalNum);
         //3、统计商品的总金额
+        //每个商品的价格乘以每个商品的数量 用reduce叠加结果
         BigDecimal totalAmount = infoVos.stream()
                 .map(items -> items.getOrderPrice().multiply(new BigDecimal(items.getSkuNum() + "")))
                 .reduce((o1, o2) ->
@@ -124,7 +132,7 @@ public class OrderBizServiceImpl implements OrderBizService {
         UserAuthInfo info = AuthUtils.getCurrentAuthInfo();
         String tradeNo = millis + "_" + info.getUserId();
 
-        //令牌在redis存一份。
+        //令牌在redis存一份。  我们是根据key来辨别  所以放什么value都无所谓
         redisTemplate.opsForValue()
                 .set(SysRedisConst.ORDER_TEMP_TOKEN + tradeNo, "1", 15, TimeUnit.MINUTES);
 
@@ -221,18 +229,42 @@ public class OrderBizServiceImpl implements OrderBizService {
                     .get();
             //有价格发生变化的商品
             throw  new GmallException(
-                    ResultCodeEnum.ORDER_PRICE_CHANGED.getMessage() + "<br/>" +skuName,
+                    //把有异常信息反馈给前端
+                    ResultCodeEnum.ORDER_PRICE_CHANGED.getMessage() + ":" +skuName,
                     ResultCodeEnum.ORDER_PRICE_CHANGED.getCode());
         }
 
         //4、把订单信息保存到数据库
         Long orderId = orderInfoService.saveOrder(submitVo,tradeNo);
 
+
+
+
         //5、清除购物车中选中的商品
         cartFeignClient.deleteChecked();
 
-        //45min不支付就要关闭。
+        //4超过指定时间(45分钟)不支付 就关闭订单
         //TODO 延时任务未做
+        //给mq发送消息 说明订单创建成功
+
+
+
+
+
+
         return orderId;
+    }
+
+    /**
+     * 关闭订单  修改订单状态
+     * @param orderId 订单id
+     * @param userId 用于id
+     */
+    @Override
+    public void closeOrder(Long orderId, Long userId) {
+        ProcessStatus closed = ProcessStatus.CLOSED;
+        List<ProcessStatus> expected = Arrays.asList(ProcessStatus.UNPAID, ProcessStatus.FINISHED);
+        //如果是未支付 或者是已结束才可以关闭订单
+        orderInfoService.changeOrderStatus(orderId,userId,closed,expected);
     }
 }

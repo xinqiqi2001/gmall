@@ -40,4 +40,11 @@ public interface OrderBizService {
     Long submitOrder(OrderSubmitVo submitVo, String tradeNo);
 
 
+    /**
+     * 关闭订单(修改数据库订单状态)
+     * @param orderId 订单id
+     * @param userId 用于id
+     */
+    void closeOrder(Long orderId, Long userId);
+
 }

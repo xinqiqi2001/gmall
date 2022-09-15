@@ -49,6 +49,7 @@ public class ShardingTest {
     @Test
     public void testInsert2(){
         OrderStatusLog orderStatusLog = new OrderStatusLog();
+        orderStatusLog.setUserId(1001l);
         orderStatusLog.setOrderId(1111L);
         orderStatusLog.setOrderStatus("UNPAID");
         orderStatusLog.setOperateTime(new Date());

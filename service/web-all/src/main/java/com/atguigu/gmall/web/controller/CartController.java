@@ -27,9 +27,7 @@ public class CartController {
     @GetMapping("/addCart.html")
     public String addCarthtml(@RequestParam("skuId") Long skuId,
                               @RequestParam("skuNum") Integer skuNum,
-
                               Model model) {
-
 
         //添加指定商品进购物车
         //存入共享域中
@@ -47,7 +45,7 @@ public class CartController {
     }
 
     /**
-     * 跳转到购物车列表
+     * 购物车列表页
      * @return
      */
     @GetMapping("/cart.html")
@@ -56,12 +54,18 @@ public class CartController {
         return "cart/index";
     }
 
-
+    /**
+     * 删除购物车中选中商品
+     * @return
+     */
     @GetMapping("/cart/deleteChecked")
     public String deleteChecked(){
 
+        /**
+         * redirect: 重定向
+         * forward: 转发
+         */
         cartFeignClient.deleteChecked();
         return "redirect:http://cart.gmall.com/cart.html";
     }
-
 }

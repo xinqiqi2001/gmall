@@ -158,12 +158,10 @@ public class CartServiceImpl implements CartService {
                 .collect(Collectors.toList());
 
         //更新购物车中所有的商品价格
-        //顺便把购物车中所有商品的价格再次查询一遍进行更新。 异步不保证立即执行。
-        //不用等价格更新。 异步情况下拿不到老请求
         //1、老请求
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         //【异步会导致feign丢失请求】
-        executor.submit( ()->  {
+        executor.submit(() -> {
             //2、绑定请求到到这个线程
             RequestContextHolder.setRequestAttributes(requestAttributes);
             updateCartAllItemsPrice(cartKey);
@@ -207,12 +205,13 @@ public class CartServiceImpl implements CartService {
 
         //获取指定购物车中的指定商品
         CartInfo fromCart = getItemFromCart(cartKey, skuId);
+
         //修改商品的选中状态
         fromCart.setIsChecked(status);
         //更新商品的修改时间
         fromCart.setUpdateTime(new Date());
         //将这个商品再存入数据库
-        hashOps.put(cartKey,Jsons.toStr(fromCart));
+        hashOps.put(skuId.toString(),Jsons.toStr(fromCart));
     }
 
     /**
@@ -245,9 +244,7 @@ public class CartServiceImpl implements CartService {
         if (ids != null && ids.size() > 0) {
             hashOps.delete(ids.toArray());
         }
-
         //stream 不是默认并发。默认串行；
-
 
     }
 
@@ -312,7 +309,7 @@ public class CartServiceImpl implements CartService {
                 .map(str ->
                         Jsons.toObj(str, CartInfo.class)
                 ).forEach(cartInfo -> {
-                    //1、查出最新价格  15ms
+                    //1、查出最新价格  1
                     Result<BigDecimal> price = skuFeignClient.getSku1010Price(cartInfo.getSkuId());
                     //2、设置新价格
                     cartInfo.setSkuPrice(price.getData());

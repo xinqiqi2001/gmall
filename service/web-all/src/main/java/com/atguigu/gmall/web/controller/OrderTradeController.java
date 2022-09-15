@@ -19,7 +19,8 @@ public class OrderTradeController {
     OrderFeignClient orderFeignClient;
 
     /**
-     * 跳转到结算界面  结算页面需要收件人地址
+     * 跳转到结算界面  结算页面需要收件人地址,和商品的各种信息
+     *
      * @param model
      * @return
      */
@@ -28,15 +29,15 @@ public class OrderTradeController {
 
         Result<OrderConfirmDataVo> orderConfirmData = orderFeignClient.getOrderConfirmData();
 
-        if (orderConfirmData.isOk()){
+        if (orderConfirmData.isOk()) {
             OrderConfirmDataVo data = orderConfirmData.getData();
-            model.addAttribute("detailArrayList",data.getDetailArrayList());
-            model.addAttribute("totalNum",data.getTotalNum());
-            model.addAttribute("totalAmount",data.getTotalAmount());
+            model.addAttribute("detailArrayList", data.getDetailArrayList());
+            model.addAttribute("totalNum", data.getTotalNum());
+            model.addAttribute("totalAmount", data.getTotalAmount());
             //用户收货地址列表
-            model.addAttribute("userAddressList",data.getUserAddressList());
+            model.addAttribute("userAddressList", data.getUserAddressList());
             //追踪订单的“交易号”
-            model.addAttribute("tradeNo",data.getTradeNo());
+            model.addAttribute("tradeNo", data.getTradeNo());
 
         }
 

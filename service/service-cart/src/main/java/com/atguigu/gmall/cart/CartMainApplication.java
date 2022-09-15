@@ -14,10 +14,11 @@ import org.springframework.cloud.openfeign.FeignClient;
  * @Date 2022/9/8 0:52
  * @Version 1.0
  */
+@EnableAutoFeignInterceptor
 @EnableThreadPool
 @EnableAutoExceptionHandler
-@SpringCloudApplication
 @EnableFeignClients(basePackages = "com.atguigu.gmall.feign.product")
+@SpringCloudApplication
 public class CartMainApplication {
     public static void main(String[] args) {
         SpringApplication.run(CartMainApplication.class,args);

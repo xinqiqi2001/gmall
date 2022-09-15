@@ -23,7 +23,7 @@ public class SysRedisConst {
     public static final String LOGIN_USER = "user:login:"; //拼接token
     public static final String USERID_HEADER = "userid";
     public static final String USERTEMPID_HEADER = "usertempid";
-    public static final String CART_KEY = "cart:user";//后面拼上你决定使用的key(用户id或临时用户id)
+    public static final String CART_KEY = "cart:user:"; //后面拼上你决定使用的key(用户id或临时用户id)
     //购物车中商品条目总数限制
     public static final long CART_ITEMS_LIMIT = 200;
     //单个商品数量限制
@@ -35,4 +35,5 @@ public class SysRedisConst {
     //订单超时关闭时间
     public static final Integer ORDER_CLOSE_TTL = 60*45; //秒为单位
     public static final Integer ORDER_REFUND_TTL = 60*60*24*30;
+    public static final String MQ_RETRY = "mq:message:";
 }

@@ -8,6 +8,8 @@ import com.atguigu.gmall.order.biz.OrderBizService;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
 import com.atguigu.gmall.order.service.OrderInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +46,7 @@ public class OrderApiController {
     }
 
     /**
+     * 提交订单成功后获取订单指定信息回显
      * 获取某个订单数据
      * @param orderId
      * @return
@@ -56,7 +59,11 @@ public class OrderApiController {
         LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<OrderInfo>()
                 .eq(OrderInfo::getId, orderId)
                 .eq(OrderInfo::getUserId, userId);
+        //根据订单id和用户id获取订单数据
         OrderInfo orderInfo = orderInfoService.getOne(wrapper);
         return Result.ok(orderInfo);
     }
+
+
+
 }
