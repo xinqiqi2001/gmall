@@ -31,3 +31,4 @@ app:
   thread-pool:
     core: 4
     max: 8
+

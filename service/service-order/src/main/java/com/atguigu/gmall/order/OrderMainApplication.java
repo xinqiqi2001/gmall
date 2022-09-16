@@ -3,11 +3,14 @@ package com.atguigu.gmall.order;
 import com.atguigu.gmall.annotation.EnableAppRabbit;
 import com.atguigu.gmall.common.annotation.EnableAutoExceptionHandler;
 import com.atguigu.gmall.common.annotation.EnableAutoFeignInterceptor;
+import com.atguigu.gmall.feign.ware.callback.WareFeignClientCallBack;
 import org.mybatis.spring.annotation.MapperScan;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableAppRabbit //自定义注解 自定义了mq操作类
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "com.atguigu.gmall.feign.ware"
 })
 @MapperScan("com.atguigu.gmall.order.mapper")
+@Import(WareFeignClientCallBack.class)
 @SpringCloudApplication
 public class OrderMainApplication {
 
