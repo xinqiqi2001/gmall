@@ -16,4 +16,4 @@ app:
     sign-type: RSA2
     charset: utf-8
     return-url: http://gmall.com/api/payment/paysuccess
-    notify-url: http://kxr23y1l2o.51xd.pub/api/payment/success/notify
+    notify-url: http://v5ir83zjk9ie.ngrok.xiaomiqiu123.top/api/payment/success/notify

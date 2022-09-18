@@ -40,13 +40,13 @@ public class OrderCloseListener {
             //2进行订单关闭
             log.info("监听到了超时订单{},正在关闭：",orderMsg);
             orderBizService.closeOrder(orderMsg.getOrderId(),orderMsg.getUserId());
-
             channel.basicAck(tag,false);
         } catch (Exception e) {
             log.error("订单业务关闭失败,消息:{},失败原因:{}",message,e);
-            // 给这个along+1
+            // 获取一个增量 尝试10遍消费
             Long aLong = redisTemplate.opsForValue().increment(SysRedisConst.MQ_RETRY + "order:" + orderMsg.getOrderId());
             if(aLong <= 10){
+                //消费不成功就在放回队列
                 channel.basicNack(tag,false,true);
             }else {
                 //不入队

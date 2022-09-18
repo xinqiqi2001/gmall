@@ -2,6 +2,7 @@ package com.atguigu.gmall.pay.service.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.atguigu.gmall.common.execption.GmallException;
 import com.atguigu.gmall.common.result.Result;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author Xiaoxin
@@ -87,5 +89,19 @@ public class AlipayServiceImpl implements AlipayService {
 
 
         return body;
+    }
+
+    /**
+     * //验证签名(验证发来的参数是不是支付宝发来的  有可能被别人篡改)
+     * @param paraMaps
+     * @return
+     */
+    @Override
+    public boolean rsaCheckV1(Map<String, String> paraMaps) throws AlipayApiException {
+        boolean b = AlipaySignature.rsaCheckV1(paraMaps,
+                alipayProperties.getAlipayPublicKey(),
+                alipayProperties.getCharset(),
+                alipayProperties.getSignType());
+        return b;
     }
 }

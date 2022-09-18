@@ -43,4 +43,17 @@ public class PayController {
         return "payment/error";
 
     }
+
+    /**
+     * TODO
+     * 跳转支付成功页面
+     */
+    @GetMapping("/pay/success.html")
+    public String paySuccessPage(){
+
+//        System.out.println("跳转登录成功页面");
+
+        return "payment/success";
+    }
+
 }

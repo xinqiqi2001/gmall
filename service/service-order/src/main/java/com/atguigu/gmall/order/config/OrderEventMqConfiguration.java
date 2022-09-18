@@ -41,8 +41,9 @@ public class OrderEventMqConfiguration {
 
         /**
          * String name,
-         * boolean durable,
          * 持久化
+         * boolean durable,
+         * 排他队列
          * boolean exclusive,
          * 自动删除
          * boolean autoDelete,
