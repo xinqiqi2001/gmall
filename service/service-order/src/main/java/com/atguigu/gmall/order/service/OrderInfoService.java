@@ -27,8 +27,24 @@ public interface OrderInfoService extends IService<OrderInfo> {
      * 将未支付或者已结束状态的订单关闭
      * @param orderId
      * @param userId
-     * @param closed
-     * @param expected
+     * @param whileChange 想要改变成什么状态
+     * @param expected  订单只有expected是这种状态才能改变
      */
-    void changeOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expected);
+    void changeOrderStatus(Long orderId, Long userId, ProcessStatus whileChange, List<ProcessStatus> expected);
+
+    /**
+     * 根据对外交易号和用户id获取订单信息
+     * @param outTradeNo
+     * @param userId
+     * @return
+     */
+    OrderInfo getOrderInfoByOutTradeNoAndUserId(String outTradeNo, Long userId);
+
+    /**
+     * 查询订单数据。
+     * @param orderId
+     * @param userId
+     * @return
+     */
+    OrderInfo getOrderInfoByOrderIdAndUserId(Long orderId, Long userId);
 }

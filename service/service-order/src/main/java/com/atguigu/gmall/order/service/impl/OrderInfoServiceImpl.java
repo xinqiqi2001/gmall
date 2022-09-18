@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import com.atguigu.gmall.model.order.OrderInfo;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.gmall.order.service.OrderInfoService;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
@@ -86,6 +87,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
      * @param closed
      * @param expected
      */
+    @Transactional
     @Override
     public void changeOrderStatus(Long orderId, Long userId,
                                   ProcessStatus closed,
@@ -96,7 +98,41 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         List<String> expects = expected.stream().map(status -> status.name()).collect(Collectors.toList());
 
         //幂等修改订单
-        orderInfoMapper.updateOrderStatus(orderId,userId,processStatus,orderStatus,expects);
+        orderInfoMapper.updateOrderStatus(orderId, userId, processStatus, orderStatus, expects);
+    }
+
+    /**
+     * 根据对外交易号和用户id获取订单信息
+     *
+     * @param outTradeNo
+     * @param userId
+     * @return
+     */
+    @Override
+    public OrderInfo getOrderInfoByOutTradeNoAndUserId(String outTradeNo, Long userId) {
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<OrderInfo>()
+                .eq(OrderInfo::getUserId, userId)
+                .eq(OrderInfo::getOutTradeNo, outTradeNo);
+
+        OrderInfo orderInfo = orderInfoMapper.selectOne(queryWrapper);
+        return orderInfo;
+    }
+
+    /**
+     * 查询订单数据。
+     * @param orderId
+     * @param userId
+     * @return
+     */
+    @Override
+    public OrderInfo getOrderInfoByOrderIdAndUserId(Long orderId, Long userId) {
+
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<OrderInfo>()
+                .eq(OrderInfo::getUserId,userId)
+                .eq(OrderInfo::getId,orderId);
+
+        OrderInfo info = orderInfoMapper.selectOne(queryWrapper);
+        return info;
     }
 
     /**

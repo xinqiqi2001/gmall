@@ -20,14 +20,15 @@ public class OrderEventMqConfiguration {
     /**
      * 项目启动发现没有这个交换机就会自动创建出来
      * 订单事件交换机
+     *
      * @return
      */
     @Bean
-    public Exchange orderEventExchange(){
+    public Exchange orderEventExchange() {
 
         //交换机名，是否持久化，是否自动删除
         TopicExchange exchange =
-                new TopicExchange(MqConst.EXCHANGE_ORDER_EVNT,true,false);
+                new TopicExchange(MqConst.EXCHANGE_ORDER_EVNT, true, false);
 
         return exchange;
     }
@@ -37,7 +38,7 @@ public class OrderEventMqConfiguration {
      * 订单延迟队列
      */
     @Bean
-    public Queue orderDelayQueue(){
+    public Queue orderDelayQueue() {
 
         /**
          * String name,
@@ -53,11 +54,11 @@ public class OrderEventMqConfiguration {
         Map<String, Object> arguments = new HashMap<>();
         //设置延迟队列参数
         //x-message-ttl队列45分钟后超时进入死信队列
-        arguments.put("x-message-ttl", SysRedisConst.ORDER_CLOSE_TTL*1000);
+        arguments.put("x-message-ttl", SysRedisConst.ORDER_CLOSE_TTL * 1000);
         //死信队列的交换机名 信死了之后交给x-dead-letter-exchange这个交换机
-        arguments.put("x-dead-letter-exchange",MqConst.EXCHANGE_ORDER_EVNT);
+        arguments.put("x-dead-letter-exchange", MqConst.EXCHANGE_ORDER_EVNT);
         //信死了之后交给x-dead-letter-exchange这个交换机用x-dead-letter-routing-key这个路由键交
-        arguments.put("x-dead-letter-routing-key",MqConst.RK_ORDER_DEAD);
+        arguments.put("x-dead-letter-routing-key", MqConst.RK_ORDER_DEAD);
 
         return new Queue(MqConst.QUEUE_ORDER_DELAY,
                 true,
@@ -69,10 +70,11 @@ public class OrderEventMqConfiguration {
 
     /**
      * 延迟队列和交换机绑定
+     *
      * @return
      */
     @Bean
-    public Binding orderDelayQueueBinding(){
+    public Binding orderDelayQueueBinding() {
 
         /**
          * String destination, 目的地
@@ -90,15 +92,16 @@ public class OrderEventMqConfiguration {
                 MqConst.EXCHANGE_ORDER_EVNT,
                 MqConst.RK_ORDER_CREATED,
                 null
-                );
+        );
     }
 
     /**
      * 死单队列：保存所有过期订单，需要进行关单
+     *
      * @return
      */
     @Bean
-    public Queue orderDeadQueue(){
+    public Queue orderDeadQueue() {
         /**
          * String name,
          * boolean durable,
@@ -114,14 +117,43 @@ public class OrderEventMqConfiguration {
 
     /**
      * 死单队列和订单事件交换机绑定
+     *
      * @return
      */
     @Bean
-    public Binding orderDeadQueueBinding(){
+    public Binding orderDeadQueueBinding() {
         return new Binding(MqConst.QUEUE_ORDER_DEAD,
                 Binding.DestinationType.QUEUE,
                 MqConst.EXCHANGE_ORDER_EVNT,
                 MqConst.RK_ORDER_DEAD,
+                null);
+    }
+
+    /**
+     * 支付成功队列
+     * @return
+     */
+    @Bean
+    public Queue orderQueue(){
+
+        return new Queue(MqConst.QUEUE_ORDER_PAYED,//队列名
+                true,//是否持久化
+                false,//是否排他
+                false);//是否自动删除
+    }
+
+
+    /**
+     * 支付成功队列路由key和交换机名
+     * @return
+     */
+    @Bean
+    public Binding payedQueueBinding() {
+
+        return new Binding(MqConst.QUEUE_ORDER_PAYED,//绑定目标队列
+                Binding.DestinationType.QUEUE,//类型
+                MqConst.EXCHANGE_ORDER_EVNT,//交换机名
+                MqConst.RK_ORDER_PAYED,//路由key
                 null);
     }
 

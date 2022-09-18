@@ -3,8 +3,13 @@ package com.atguigu.gmall.order.listener;
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.constant.MqConst;
+import com.atguigu.gmall.model.enums.ProcessStatus;
+import com.atguigu.gmall.model.payment.PaymentInfo;
 import com.atguigu.gmall.model.to.mq.OrderMsg;
 import com.atguigu.gmall.order.biz.OrderBizService;
+import com.atguigu.gmall.order.service.OrderInfoService;
+import com.atguigu.gmall.order.service.PaymentInfoService;
+import com.atguigu.gmall.service.RabbitService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -14,6 +19,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author Xiaoxin
@@ -24,13 +32,20 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class OrderCloseListener {
-    @Autowired
+
     StringRedisTemplate redisTemplate;
-
-    @Autowired
     OrderBizService orderBizService;
+    RabbitService rabbitService;
 
-    @RabbitListener(queues = MqConst.QUEUE_ORDER_DEAD)
+    public OrderCloseListener(StringRedisTemplate redisTemplate,
+                              OrderBizService orderBizService,
+                              RabbitService rabbitService){
+        this.redisTemplate = redisTemplate;
+        this.orderBizService = orderBizService;
+        this.rabbitService = rabbitService;
+    }
+
+    @RabbitListener(queues = MqConst.QUEUE_ORDER_DEAD)//死单队列
     public void orderClose(Message message,Channel channel)throws IOException{
         long tag = message.getMessageProperties().getDeliveryTag();
         //1拿到订单消息
@@ -43,20 +58,12 @@ public class OrderCloseListener {
             channel.basicAck(tag,false);
         } catch (Exception e) {
             log.error("订单业务关闭失败,消息:{},失败原因:{}",message,e);
-            // 获取一个增量 尝试10遍消费
-            Long aLong = redisTemplate.opsForValue().increment(SysRedisConst.MQ_RETRY + "order:" + orderMsg.getOrderId());
-            if(aLong <= 10){
-                //消费不成功就在放回队列
-                channel.basicNack(tag,false,true);
-            }else {
-                //不入队
-                channel.basicNack(tag,false,false);
-                //删除
-                redisTemplate.delete(SysRedisConst.MQ_RETRY + "order:" + orderMsg.getOrderId());
-            }
+            String uniqKey=SysRedisConst.MQ_RETRY+"order:"+orderMsg.getOrderId();
+            rabbitService.retryConsumMsg(10L,uniqKey,tag,channel);
         }
 
 
     }
+
 
 }

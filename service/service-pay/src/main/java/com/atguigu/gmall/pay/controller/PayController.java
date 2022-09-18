@@ -81,8 +81,9 @@ public class PayController {
         boolean b = alipayService.rsaCheckV1(paraMaps);
         if (b) {
             log.info("支付成功，验签通过异步通知成功抵达，数据{}", Jsons.toStr(paraMaps));
-            //修改订单状态 最大努力通知8次
 
+            //修改订单状态(支付成功修改订单状态为已支付) 最大努力通知8次
+            alipayService.sendPayedMsg(paraMaps);
 
         }else {
             //验签通过

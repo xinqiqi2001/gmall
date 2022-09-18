@@ -1,14 +1,20 @@
 package com.atguigu.gmall.rabbit;
 
+import com.atguigu.gmall.service.RabbitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.amqp.RabbitTemplateConfigurer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.retry.support.RetryTemplate;
 
 /**
@@ -19,11 +25,12 @@ import org.springframework.retry.support.RetryTemplate;
 @Slf4j
 @EnableRabbit
 @Configuration
+@AutoConfigureAfter(RedisAutoConfiguration.class)
 public class AppRabbitConfiguration {
 
     @Bean
     RabbitTemplate rabbitTemplate(RabbitTemplateConfigurer configurer,
-                                  ConnectionFactory connectionFactory)  {
+                                  ConnectionFactory connectionFactory) {
 
         RabbitTemplate rabbitTemplate = new RabbitTemplate();
         configurer.configure(rabbitTemplate, connectionFactory);
@@ -40,11 +47,11 @@ public class AppRabbitConfiguration {
 
         //感知消息是否真的被投递到服务器[服务器连接有问题，错误的exchange...]
         rabbitTemplate.setConfirmCallback((CorrelationData correlationData,
-                                     boolean ack,
-                                     String cause)->{
+                                           boolean ack,
+                                           String cause) -> {
 
-            if(!ack){
-                log.error("消息投递到服务器失败，保存到数据库,消息：{}",correlationData);
+            if (!ack) {
+                log.error("消息投递到服务器失败，保存到数据库,消息：{}", correlationData);
             }
         });
 
@@ -52,5 +59,15 @@ public class AppRabbitConfiguration {
         rabbitTemplate.setRetryTemplate(new RetryTemplate());
 
         return rabbitTemplate;
+    }
+
+    /**
+     * 容器中有redis才需要加入RabbitService
+     * @return
+     */
+//    @ConditionalOnBean(StringRedisTemplate.class)
+    @Bean
+    RabbitService rabbitService() {
+        return new RabbitService();
     }
 }
