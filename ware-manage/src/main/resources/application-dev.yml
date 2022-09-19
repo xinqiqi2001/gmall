@@ -1,5 +1,5 @@
 server:
-  port: 9002
+  port: 9001
 
 mybatis-plus:
   configuration:
@@ -59,4 +59,4 @@ spring:
 
 order:
   split:
-    url: http://localhost:8204/api/order/orderSplit
+    url: http://api.gmall.com/api/order/orderSplit

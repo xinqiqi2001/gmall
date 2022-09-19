@@ -1,8 +1,6 @@
 package com.atguigu.gmall.pay.controller;
 
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.internal.util.AlipaySignature;
-import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.pay.service.AlipayService;
 import lombok.extern.slf4j.Slf4j;

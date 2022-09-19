@@ -3,6 +3,11 @@ package com.atguigu.gmall.order.biz;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
+import com.atguigu.gmall.model.vo.order.OrderWareMapVo;
+import com.atguigu.gmall.model.vo.order.WareChildOrderVo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author Xiaoxin
@@ -47,4 +52,10 @@ public interface OrderBizService {
      */
     void closeOrder(Long orderId, Long userId);
 
+    /**
+     * 把一个大订单拆分成指定的多个小订单
+     * @param params
+     * @return
+     */
+    List<WareChildOrderVo> orderSplit(OrderWareMapVo params);
 }

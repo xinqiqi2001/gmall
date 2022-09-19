@@ -45,7 +45,7 @@ public class OrderStockDeduceListener {
 
     /**
      * 如果标注的交换机、队列没有，会自动创建
-     *
+     * 订单支付成功减库存之后需要修改订单状态
      * @param message
      * @param channel
      */

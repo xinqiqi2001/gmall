@@ -93,7 +93,7 @@ public class OrderInfo extends BaseEntity {
     private String imgUrl;
 
     @TableField(exist = false)
-    private List<OrderDetail> orderDetailList;
+    private List<OrderDetail> orderDetailList; //子单明细
 
     @TableField(exist = false)
     private String wareId;
