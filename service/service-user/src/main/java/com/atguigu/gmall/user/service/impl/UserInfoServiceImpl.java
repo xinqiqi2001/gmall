@@ -39,7 +39,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
         //查询数据库中这个账号密码是否存在
         LambdaQueryWrapper<UserInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(UserInfo::getName,userInfo.getLoginName())
+        lambdaQueryWrapper.eq(UserInfo::getLoginName,userInfo.getLoginName())
                 .eq(UserInfo::getPasswd, MD5.encrypt(userInfo.getPasswd()));
 
         UserInfo userInfo1 = userInfoMapper.selectOne(lambdaQueryWrapper);
