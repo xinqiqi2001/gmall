@@ -35,4 +35,10 @@ public interface SeckillGoodsService extends IService<SeckillGoods> {
      * @return
      */
     SeckillGoods getSeckillGoodDetail(Long skuId);
+
+    /**
+     * 根据商品id减秒杀库存
+     * @param skuId
+     */
+    void deduceSeckillGoods(Long skuId);
 }

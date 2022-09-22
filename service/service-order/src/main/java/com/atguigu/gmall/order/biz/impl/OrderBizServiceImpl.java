@@ -246,10 +246,6 @@ public class OrderBizServiceImpl implements OrderBizService {
         //5、清除购物车中选中的商品
         cartFeignClient.deleteChecked();
 
-        //4超过指定时间(45分钟)不支付 就关闭订单
-        //TODO 延时任务未做
-        //给mq发送消息 说明订单创建成功
-
 
         return orderId;
     }

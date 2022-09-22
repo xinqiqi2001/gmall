@@ -58,6 +58,15 @@ public class SeckillGoodsServiceImpl extends ServiceImpl<SeckillGoodsMapper, Sec
 
         return cacheOpsService.getSeckillGoodsDetail(skuId);
     }
+
+    /**
+     * 根据商品id减秒杀商品库存
+     * @param skuId
+     */
+    @Override
+    public void deduceSeckillGoods(Long skuId) {
+        seckillGoodsMapper.updateStockCount(skuId);
+    }
 }
 
 

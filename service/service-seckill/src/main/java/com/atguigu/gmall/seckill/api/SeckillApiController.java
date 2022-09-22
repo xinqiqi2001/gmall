@@ -3,6 +3,8 @@ package com.atguigu.gmall.seckill.api;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.feign.seckill.SeckillFeignClient;
 import com.atguigu.gmall.model.activity.SeckillGoods;
+import com.atguigu.gmall.model.vo.seckill.SeckillOrderConfirmVo;
+import com.atguigu.gmall.seckill.biz.SeckillBizService;
 import com.atguigu.gmall.seckill.service.SeckillGoodsCacheOpsService;
 import com.atguigu.gmall.seckill.service.SeckillGoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,10 @@ import java.util.List;
 public class SeckillApiController {
 
     @Autowired
-    SeckillGoodsCacheOpsService cacheOpsService;
+    SeckillGoodsService seckillGoodsService;
 
     @Autowired
-    SeckillGoodsService seckillGoodsService;
+    SeckillBizService seckillBizService;
     /**
      * 获取当天所有秒杀商品的数据
      *
@@ -46,6 +48,22 @@ public class SeckillApiController {
 
         SeckillGoods seckillGoods = seckillGoodsService.getSeckillGoodDetail(skuId);
         return Result.ok(seckillGoods);
+    }
+
+    /**
+     * 获取秒杀确认页数据
+     * @param skuId
+     * @return
+     */
+    @GetMapping("/order/confirmvo/{skuId}")
+    public Result<SeckillOrderConfirmVo> getSeckillOrderConfirmVo
+    (@PathVariable("skuId") Long skuId){
+
+        SeckillOrderConfirmVo vo = seckillBizService
+                .getSeckillOrderConfirmVo(skuId);
+
+
+        return Result.ok(vo);
     }
 
 }
